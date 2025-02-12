@@ -1,0 +1,83 @@
+name: promocode
+
+services:
+  postgres:
+    image: postgres:16.6
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME} -d ${POSTGRES_DATABASE}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    volumes:
+      - app-db-data:/var/lib/postgresql/data/pgdata
+    env_file:
+      - path: .env.template
+        required: true
+      - path: .env
+        required: false
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      PGPORT: $POSTGRES_PORT
+    ports:
+      - "$POSTGRES_PORT:$POSTGRES_PORT"
+
+  redis:
+    image: redis:7.4
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: >
+      sh -c '
+        mkdir -p /usr/local/etc/redis &&
+        echo "bind 0.0.0.0" > /usr/local/etc/redis/redis.conf &&
+        redis-server /usr/local/etc/redis/redis.conf
+      '
+    ports:
+      - "$REDIS_PORT:$REDIS_PORT"
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+
+  backend:
+    restart: always
+    networks:
+      - default
+    ports:
+      - "$SERVER_PORT:$SERVER_PORT"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+    env_file:
+      - path: .env.template
+        required: true
+      - path: .env
+        required: false
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      ANTIFRAUD_ADDRESS: "antifraud:$ANTIFRAUD_PORT"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://$SERVER_ADDRESS/api/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    build:
+      context: .
+
+  antifraud:
+    image: lodthe/prod-backend-antifraud:latest
+    networks:
+      - default
+    ports:
+      - "$ANTIFRAUD_PORT:$ANTIFRAUD_PORT"
+    environment:
+      SERVER_PORT: $ANTIFRAUD_PORT
+      CACHE_DURATION_MS: 5000
+
+volumes:
+  app-db-data:
