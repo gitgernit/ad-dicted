@@ -31,10 +31,10 @@ class ScoreUsecase:
         self.advertiser_repository = advertiser_repository
 
     async def create_score(self, dto: ScoreDTO, *, overwrite: bool = False) -> ScoreDTO:
-        if self.client_repository.get_client(dto.client_id) is None:
+        if await self.client_repository.get_client(dto.client_id) is None:
             raise ClientNotFoundError
 
-        if self.advertiser_repository.get_advertiser(dto.advertiser_id) is None:
+        if await self.advertiser_repository.get_advertiser(dto.advertiser_id) is None:
             raise AdvertiserNotFoundError
 
         score = Score(

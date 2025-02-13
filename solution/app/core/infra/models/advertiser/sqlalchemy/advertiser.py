@@ -18,7 +18,7 @@ class Advertiser(Base):
     )
     name: Mapped[str] = mapped_column(sa.String, nullable=False)
 
-    scores: Mapped[list['Score']] = relationship(
+    score: Mapped['Score'] = relationship(
         'Score',
         back_populates='advertiser',
     )
