@@ -1,7 +1,7 @@
 import abc
 import uuid
 
-from app.core.domain.advertisers.entities.entities import Advertiser
+from app.core.domain.advertiser.entities.entities import Advertiser
 
 
 class AdvertiserRepository(abc.ABC):

@@ -2,9 +2,9 @@ import uuid
 
 import dishka
 
-from app.core.domain.advertisers.entities.entities import Advertiser
-from app.core.domain.advertisers.entities.repositories import AdvertiserRepository
-from app.core.domain.advertisers.service.dto import AdvertiserDTO
+from app.core.domain.advertiser.entities.entities import Advertiser
+from app.core.domain.advertiser.entities.repositories import AdvertiserRepository
+from app.core.domain.advertiser.service.dto import AdvertiserDTO
 
 
 class AdvertiserUsecase:

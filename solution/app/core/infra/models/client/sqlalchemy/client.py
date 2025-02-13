@@ -7,7 +7,7 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
-from app.core.infrastructure.models.sqlalchemy import Base
+from app.core.infra.models.sqlalchemy import Base
 
 
 class Gender(enum.Enum):

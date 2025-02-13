@@ -25,8 +25,8 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 
 from app.core.config import psycopg_url
-from app.core.infrastructure.models.sqlalchemy import Base
-from app.core.infrastructure.models.sqlalchemy import load_models
+from app.core.infra.models.sqlalchemy import Base
+from app.core.infra.models.sqlalchemy import load_models
 
 load_models()
 

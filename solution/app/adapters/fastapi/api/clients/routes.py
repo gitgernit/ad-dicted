@@ -17,7 +17,7 @@ async def bulk_create_clients(
     usecase: FromDishka[ClientUsecase],
     clients: list[ClientSchema],
 ) -> list[ClientSchema]:
-    created: list[ClientDTO] = []
+    dtos: list[ClientDTO] = []
 
     for client in clients:
         dto = ClientDTO(
@@ -29,21 +29,18 @@ async def bulk_create_clients(
         )
 
         created_dto = await usecase.create_client(dto, overwrite=True)
-        created.append(created_dto)
+        dtos.append(created_dto)
 
-    output = []
-
-    for dto in created:
-        schema = ClientSchema(
+    return [
+        ClientSchema(
             client_id=dto.id,
             login=dto.login,
             age=dto.age,
             location=dto.location,
             gender=dto.gender,
         )
-        output.append(schema)
-
-    return output
+        for dto in dtos
+    ]
 
 
 @clients_router.get('/{clientId}')

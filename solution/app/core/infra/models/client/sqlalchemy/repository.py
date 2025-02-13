@@ -5,7 +5,7 @@ import sqlalchemy.ext.asyncio
 
 from app.core.domain.client.entities.entities import Client as DomainClient
 from app.core.domain.client.entities.repositories import ClientRepository
-from app.core.infrastructure.models.client.sqlalchemy.client import Client
+from app.core.infra.models.client.sqlalchemy.client import Client
 
 
 class SQLAlchemyClientRepository(ClientRepository):

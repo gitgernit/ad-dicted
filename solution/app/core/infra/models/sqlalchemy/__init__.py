@@ -8,5 +8,5 @@ Base: sqlalchemy.ext.declarative.DeclarativeMeta = (
 
 
 def load_models() -> None:
-    import app.core.infrastructure.models.advertiser.sqlalchemy.advertiser
-    import app.core.infrastructure.models.client.sqlalchemy.client
+    import app.core.infra.models.advertiser.sqlalchemy.advertiser
+    import app.core.infra.models.client.sqlalchemy.client

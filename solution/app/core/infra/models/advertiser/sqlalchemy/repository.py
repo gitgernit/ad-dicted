@@ -1,17 +1,11 @@
 import uuid
 
 import dishka
-
-from app.core.domain.advertisers.entities.entities import Advertiser as DomainAdvertiser
-
-if __name__ == '__main__':
-    from app.core.infrastructure.models.advertiser.sqlalchemy.advertiser import (
-        Advertiser,
-    )
-
 import sqlalchemy.ext.asyncio
 
-from app.core.domain.advertisers.entities.repositories import AdvertiserRepository
+from app.core.domain.advertiser.entities.entities import Advertiser as DomainAdvertiser
+from app.core.domain.advertiser.entities.repositories import AdvertiserRepository
+from app.core.infra.models.advertiser.sqlalchemy.advertiser import Advertiser
 
 
 class SQLAlchemyAdvertiserRepository(AdvertiserRepository):
