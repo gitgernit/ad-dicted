@@ -54,5 +54,5 @@ async def get_advertiser(
 
     return AdvertiserSchema(
         advertiser_id=dto.id,
-        name=dto.name
+        name=dto.name,
     )

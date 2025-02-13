@@ -1,9 +1,8 @@
 import enum
 import uuid
 
-from sqlalchemy import Enum
-from sqlalchemy import Integer
-from sqlalchemy import String
+from sqlalchemy.orm import relationship
+import sqlalchemy as sa
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
@@ -23,7 +22,9 @@ class Client(Base):
         primary_key=True,
         unique=True,
     )
-    login: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    age: Mapped[int] = mapped_column(Integer, nullable=False)
-    location: Mapped[str] = mapped_column(String, nullable=False)
-    gender: Mapped[Gender] = mapped_column(Enum(Gender), nullable=False)
+    login: Mapped[str] = mapped_column(sa.String, nullable=False, unique=True)
+    age: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    location: Mapped[str] = mapped_column(sa.String, nullable=False)
+    gender: Mapped[Gender] = mapped_column(sa.Enum(Gender), nullable=False)
+
+    scores: Mapped[list['Score']] = relationship('Score', back_populates='client')
