@@ -11,8 +11,8 @@ from app.core.infrastructure.models.sqlalchemy import Base
 
 
 class Gender(enum.Enum):
-    MALE = 'male'
-    FEMALE = 'female'
+    MALE = 'MALE'
+    FEMALE = 'FEMALE'
 
 
 class Client(Base):

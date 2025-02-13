@@ -8,6 +8,6 @@ api_router = fastapi.APIRouter(
 )
 
 api_router.include_router(
-    app.adapters.fastapi.api.clients.routes.client_router,
+    app.adapters.fastapi.api.clients.routes.clients_router,
     prefix='/clients',
 )

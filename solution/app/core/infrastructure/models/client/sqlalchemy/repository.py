@@ -17,7 +17,12 @@ class SQLAlchemyClientRepository(ClientRepository):
     ) -> None:
         self._session_factory = session_factory
 
-    async def create_client(self, client: DomainClient, overwrite: bool = False) -> DomainClient:
+    async def create_client(
+        self,
+        client: DomainClient,
+        *,
+        overwrite: bool = False,
+    ) -> DomainClient:
         async with self._session_factory() as session, session.begin():
             new_client = Client(
                 id=client.id,

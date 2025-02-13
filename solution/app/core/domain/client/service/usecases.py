@@ -11,7 +11,9 @@ class ClientUsecase:
     def __init__(self, client_repository: ClientRepository) -> None:
         self.repository = client_repository
 
-    async def create_client(self, dto: ClientDTO, overwrite: bool = False) -> ClientDTO:
+    async def create_client(
+        self, dto: ClientDTO, *, overwrite: bool = False,
+    ) -> ClientDTO:
         client = Client(**dto.model_dump())
         client = await self.repository.create_client(client, overwrite=overwrite)
 
@@ -23,8 +25,11 @@ class ClientUsecase:
             gender=client.gender,
         )
 
-    async def get_client(self, client_id: uuid.UUID) -> ClientDTO:
+    async def get_client(self, client_id: uuid.UUID) -> ClientDTO | None:
         client = await self.repository.get_client(client_id)
+
+        if client is None:
+            return None
 
         return ClientDTO(
             id=client.id,

@@ -6,7 +6,7 @@ from app.core.domain.client.entities.entities import Client
 
 class ClientRepository(abc.ABC):
     @abc.abstractmethod
-    async def create_client(self, client: Client, overwrite: bool = False) -> Client:
+    async def create_client(self, client: Client, *, overwrite: bool = False) -> Client:
         pass
 
     @abc.abstractmethod
