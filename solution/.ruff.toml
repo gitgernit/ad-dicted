@@ -1,6 +1,6 @@
 extend-exclude = [".github", "proto", "gen", "alembic"]
 force-exclude = true
-line-length = 88
+line-length = 79
 show-fixes = true
 target-version = "py312"
 

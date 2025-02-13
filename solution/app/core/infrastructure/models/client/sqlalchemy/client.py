@@ -8,15 +8,17 @@ from app.core.infrastructure.models.sqlalchemy import Base
 
 
 class Gender(enum.Enum):
-    MALE = "male"
-    FEMALE = "female"
+    MALE = 'male'
+    FEMALE = 'female'
 
 
 class Client(Base):
-    __tablename__ = "clients"
+    __tablename__ = 'clients'
 
     id: Mapped[uuid.UUID] = mapped_column(
-        default=uuid.uuid4, primary_key=True, unique=True
+        default=uuid.uuid4,
+        primary_key=True,
+        unique=True,
     )
     login: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     age: Mapped[int] = mapped_column(Integer, nullable=False)

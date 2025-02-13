@@ -23,25 +23,6 @@ services:
     ports:
       - "$POSTGRES_PORT:$POSTGRES_PORT"
 
-  redis:
-    image: redis:7.4
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    command: >
-      sh -c '
-        mkdir -p /usr/local/etc/redis &&
-        echo "bind 0.0.0.0" > /usr/local/etc/redis/redis.conf &&
-        redis-server /usr/local/etc/redis/redis.conf
-      '
-    ports:
-      - "$REDIS_PORT:$REDIS_PORT"
-    restart: unless-stopped
-    tty: true
-    stdin_open: true
-
   backend:
     restart: always
     networks:
@@ -67,16 +48,6 @@ services:
       retries: 5
     build:
       context: .
-
-  antifraud:
-    image: lodthe/prod-backend-antifraud:latest
-    networks:
-      - default
-    ports:
-      - "$ANTIFRAUD_PORT:$ANTIFRAUD_PORT"
-    environment:
-      SERVER_PORT: $ANTIFRAUD_PORT
-      CACHE_DURATION_MS: 5000
 
 volumes:
   app-db-data:
