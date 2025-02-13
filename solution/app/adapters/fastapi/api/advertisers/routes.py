@@ -1,3 +1,6 @@
+import typing
+import uuid
+
 from dishka.integrations.fastapi import DishkaRoute
 from dishka.integrations.fastapi import FromDishka
 import fastapi
@@ -34,3 +37,22 @@ async def bulk_create_advertisers(
         )
         for dto in dtos
     ]
+
+
+@advertisers_router.get('/{advertiserId}')
+async def get_advertiser(
+    usecase: FromDishka[AdvertiserUsecase],
+    advertiser_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='advertiserId')],
+) -> AdvertiserSchema:
+    dto = await usecase.get_advertiser(advertiser_id=advertiser_id)
+
+    if dto is None:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='No such advertiser.',
+        )
+
+    return AdvertiserSchema(
+        advertiser_id=dto.id,
+        name=dto.name
+    )
