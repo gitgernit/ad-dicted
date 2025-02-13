@@ -11,9 +11,9 @@ class ClientUsecase:
     def __init__(self, client_repository: ClientRepository) -> None:
         self.repository = client_repository
 
-    async def create_client(self, dto: ClientDTO) -> ClientDTO:
+    async def create_client(self, dto: ClientDTO, overwrite: bool = False) -> ClientDTO:
         client = Client(**dto.model_dump())
-        client = await self.repository.create_client(client)
+        client = await self.repository.create_client(client, overwrite=overwrite)
 
         return ClientDTO(
             id=client.id,

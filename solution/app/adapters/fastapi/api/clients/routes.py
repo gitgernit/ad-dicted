@@ -25,7 +25,7 @@ async def bulk_create_clients(
             gender=client.gender,
         )
 
-        created_dto = await usecase.create_client(dto)
+        created_dto = await usecase.create_client(dto, overwrite=True)
         created.append(created_dto)
 
     output = []

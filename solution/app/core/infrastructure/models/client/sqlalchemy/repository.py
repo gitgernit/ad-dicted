@@ -17,7 +17,7 @@ class SQLAlchemyClientRepository(ClientRepository):
     ) -> None:
         self._session_factory = session_factory
 
-    async def create_client(self, client: DomainClient) -> DomainClient:
+    async def create_client(self, client: DomainClient, overwrite: bool = False) -> DomainClient:
         async with self._session_factory() as session, session.begin():
             new_client = Client(
                 id=client.id,
@@ -26,6 +26,9 @@ class SQLAlchemyClientRepository(ClientRepository):
                 location=client.location,
                 gender=client.gender,
             )
+
+            if overwrite:
+                new_client = await session.merge(new_client)
 
             session.add(new_client)
 
