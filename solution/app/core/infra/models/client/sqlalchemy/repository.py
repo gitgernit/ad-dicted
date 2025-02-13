@@ -40,7 +40,13 @@ class SQLAlchemyClientRepository(ClientRepository):
             await session.flush()
             session.expunge_all()
 
-            return client
+            return DomainClient(
+                id=new_client.id,
+                login=new_client.login,
+                age=new_client.age,
+                location=new_client.location,
+                gender=new_client.gender,
+            )
 
     async def get_client(self, client_id: uuid.UUID) -> DomainClient | None:
         async with self._session_factory() as session:

@@ -12,7 +12,10 @@ class ClientUsecase:
         self.repository = client_repository
 
     async def create_client(
-        self, dto: ClientDTO, *, overwrite: bool = False,
+        self,
+        dto: ClientDTO,
+        *,
+        overwrite: bool = False,
     ) -> ClientDTO:
         client = Client(**dto.model_dump())
         client = await self.repository.create_client(client, overwrite=overwrite)
