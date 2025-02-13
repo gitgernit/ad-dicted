@@ -1,4 +1,4 @@
-name: promocode
+name: advertisement
 
 services:
   postgres:
@@ -60,7 +60,6 @@ services:
     environment:
       POSTGRES_HOST: postgres
       REDIS_HOST: redis
-      ANTIFRAUD_ADDRESS: "antifraud:$ANTIFRAUD_PORT"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://$SERVER_ADDRESS/api/ping"]
       interval: 10s

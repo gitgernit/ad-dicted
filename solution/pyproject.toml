@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
     "aiohttp>=3.11.11",
     "alembic>=1.14.0",
+    "dishka[fastapi]>=1.4.2",
     "fastapi[standard]>=0.115.6",
     "psycopg[binary]>=3.2.4",
     "pydantic-settings>=2.7.1",
