@@ -1,8 +1,11 @@
 import enum
 import uuid
 
-from sqlalchemy import String, Integer, Enum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Enum
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
 
 from app.core.infrastructure.models.sqlalchemy import Base
 

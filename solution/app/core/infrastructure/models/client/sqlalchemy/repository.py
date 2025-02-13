@@ -1,10 +1,11 @@
 import uuid
 
 import dishka
-from app.core.domain.client.entities.entities import Client
-from app.core.domain.client.entities.repositories import ClientRepository
-
 import sqlalchemy.ext.asyncio
+
+from app.core.domain.client.entities.entities import Client as DomainClient
+from app.core.domain.client.entities.repositories import ClientRepository
+from app.core.infrastructure.models.client.sqlalchemy.client import Client
 
 
 class SQLAlchemyClientRepository(ClientRepository):
@@ -16,14 +17,46 @@ class SQLAlchemyClientRepository(ClientRepository):
     ) -> None:
         self._session_factory = session_factory
 
-    async def create_client(self, client: Client) -> Client:
-        pass
+    async def create_client(self, client: DomainClient) -> DomainClient:
+        async with self._session_factory() as session, session.begin():
+            new_client = Client(
+                id=client.id,
+                login=client.login,
+                age=client.age,
+                location=client.location,
+                gender=client.gender,
+            )
 
-    async def get_client(self, client_id: uuid.UUID) -> Client:
-        pass
+            session.add(new_client)
+
+            await session.flush()
+            session.expunge_all()
+
+            return client
+
+    async def get_client(self, client_id: uuid.UUID) -> DomainClient | None:
+        async with self._session_factory() as session:
+            stmt = sqlalchemy.select(Client).where(Client.id == client_id)
+            result = await session.execute(stmt)
+
+            session.expunge_all()
+
+            client = result.scalars().first()
+
+            if client is None:
+                return None
+
+            return DomainClient(
+                id=client.id,
+                login=client.login,
+                age=client.age,
+                location=client.location,
+                gender=client.gender,
+            )
 
 
 repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
 repository_provider.provide(
-    SQLAlchemyClientRepository, provides=ClientRepository
+    SQLAlchemyClientRepository,
+    provides=ClientRepository,
 )

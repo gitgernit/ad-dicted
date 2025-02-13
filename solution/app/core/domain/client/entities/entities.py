@@ -5,8 +5,8 @@ import pydantic
 
 
 class Gender(enum.StrEnum):
-    MALE = 'male'
-    FEMALE = 'female'
+    MALE = 'MALE'
+    FEMALE = 'FEMALE'
 
 
 class Client(pydantic.BaseModel):

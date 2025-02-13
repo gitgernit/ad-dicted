@@ -9,8 +9,8 @@ class Gender(enum.StrEnum):
     FEMALE = 'FEMALE'
 
 
-class ClientDTO(pydantic.BaseModel):
-    id: uuid.UUID
+class ClientSchema(pydantic.BaseModel):
+    client_id: uuid.UUID
     login: str
     age: int
     location: str
