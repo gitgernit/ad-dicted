@@ -1,0 +1,123 @@
+import typing
+import uuid
+
+from dishka.integrations.fastapi import DishkaRoute
+from dishka.integrations.fastapi import FromDishka
+import fastapi
+
+from app.adapters.fastapi.api.advertisers.campaigns.schemas import CampaignInputSchema
+from app.adapters.fastapi.api.advertisers.campaigns.schemas import CampaignOutputSchema
+from app.adapters.fastapi.api.advertisers.campaigns.schemas import TargetingSchema
+from app.core.domain.campaign.service.dto import CampaignDTO
+from app.core.domain.campaign.service.dto import TargetingDTO
+from app.core.domain.campaign.service.usecases import AdvertiserNotFoundError
+from app.core.domain.campaign.service.usecases import CampaignUsecase
+
+campaigns_router = fastapi.APIRouter(route_class=DishkaRoute)
+
+
+@campaigns_router.post(
+    '',
+    status_code=fastapi.status.HTTP_201_CREATED,
+    response_model_exclude_unset=True,
+)
+async def create_campaign(
+    usecase: FromDishka[CampaignUsecase],
+    advertiser_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='advertiserId')],
+    campaign: CampaignInputSchema,
+) -> CampaignOutputSchema:
+    targeting_dto = (
+        TargetingDTO(
+            gender=campaign.targeting.gender,
+            age_from=campaign.targeting.age_from,
+            age_to=campaign.targeting.age_to,
+            location=campaign.targeting.location,
+        )
+        if campaign.targeting
+        else None
+    )
+    campaign_dto = CampaignDTO(
+        advertiser_id=advertiser_id,
+        impressions_limit=campaign.impressions_limit,
+        clicks_limit=campaign.clicks_limit,
+        cost_per_impression=campaign.cost_per_impression,
+        cost_per_click=campaign.cost_per_click,
+        ad_title=campaign.ad_title,
+        ad_text=campaign.ad_text,
+        start_date=campaign.start_date,
+        end_date=campaign.end_date,
+        targeting=targeting_dto,
+    )
+
+    try:
+        new_campaign = await usecase.create_campaign(campaign_dto)
+
+    except AdvertiserNotFoundError as error:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='No such advertiser found.',
+        ) from error
+
+    targeting_schema = (
+        TargetingSchema(
+            gender=new_campaign.targeting.gender,
+            age_from=new_campaign.targeting.age_from,
+            age_to=new_campaign.targeting.age_to,
+            location=new_campaign.targeting.location,
+        )
+        if new_campaign.targeting
+        else None
+    )
+
+    return CampaignOutputSchema(
+        impressions_limit=new_campaign.impressions_limit,
+        clicks_limit=new_campaign.clicks_limit,
+        cost_per_impression=new_campaign.cost_per_impression,
+        cost_per_click=new_campaign.cost_per_click,
+        ad_title=new_campaign.ad_title,
+        ad_text=new_campaign.ad_text,
+        start_date=new_campaign.start_date,
+        end_date=new_campaign.end_date,
+        targeting=targeting_schema,
+        campaign_id=new_campaign.id,
+        advertiser_id=new_campaign.advertiser_id,
+    )
+
+
+@campaigns_router.get('/{campaignId}', response_model_exclude_none=True)
+async def get_campaign(
+    usecase: FromDishka[CampaignUsecase],
+    campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='campaignId')],
+) -> CampaignOutputSchema:
+    campaign_dto = await usecase.get_campaign(campaign_id)
+
+    if campaign_dto is None:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='No such campaign.',
+        )
+
+    targeting_schema = (
+        TargetingSchema(
+            gender=campaign_dto.targeting.gender,
+            age_from=campaign_dto.targeting.age_from,
+            age_to=campaign_dto.targeting.age_to,
+            location=campaign_dto.targeting.location,
+        )
+        if campaign_dto.targeting
+        else None
+    )
+
+    return CampaignOutputSchema(
+        impressions_limit=campaign_dto.impressions_limit,
+        clicks_limit=campaign_dto.clicks_limit,
+        cost_per_impression=campaign_dto.cost_per_impression,
+        cost_per_click=campaign_dto.cost_per_click,
+        ad_title=campaign_dto.ad_title,
+        ad_text=campaign_dto.ad_text,
+        start_date=campaign_dto.start_date,
+        end_date=campaign_dto.end_date,
+        targeting=targeting_schema,
+        campaign_id=campaign_dto.id,
+        advertiser_id=campaign_dto.advertiser_id,
+    )

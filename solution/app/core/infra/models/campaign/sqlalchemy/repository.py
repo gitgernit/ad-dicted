@@ -122,4 +122,4 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
 
 
 repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
-repository_provider.provide(SQLAlchemyCampaignRepository)
+repository_provider.provide(SQLAlchemyCampaignRepository, provides=CampaignRepository)

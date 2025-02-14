@@ -5,12 +5,18 @@ from dishka.integrations.fastapi import DishkaRoute
 from dishka.integrations.fastapi import FromDishka
 import fastapi
 
+import app.adapters.fastapi.api.advertisers.campaigns.routes
 from app.adapters.fastapi.api.advertisers.schemas import AdvertiserSchema
 from app.core.domain.advertiser.service.dto import AdvertiserDTO
 from app.core.domain.advertiser.service.usecases import AdvertiserUsecase
 
 advertisers_router = fastapi.APIRouter(
     route_class=DishkaRoute,
+)
+
+advertisers_router.include_router(
+    app.adapters.fastapi.api.advertisers.campaigns.routes.campaigns_router,
+    prefix='/{advertiserId}/campaigns',
 )
 
 

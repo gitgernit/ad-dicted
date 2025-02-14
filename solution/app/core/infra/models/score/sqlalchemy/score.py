@@ -23,5 +23,5 @@ class Score(Base):
     )
     score: Mapped[int] = mapped_column(sa.Integer, nullable=False)
 
-    client = relationship('Client', back_populates='score')
-    advertiser = relationship('Advertiser', back_populates='score')
+    client = relationship('Client', back_populates='scores')
+    advertiser = relationship('Advertiser', back_populates='scores')

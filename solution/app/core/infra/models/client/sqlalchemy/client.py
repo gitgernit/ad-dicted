@@ -27,4 +27,8 @@ class Client(Base):
     location: Mapped[str] = mapped_column(sa.String, nullable=False)
     gender: Mapped[Gender] = mapped_column(sa.Enum(Gender), nullable=False)
 
-    score: Mapped['Score'] = relationship('Score', back_populates='client')
+    scores: Mapped[list['Score']] = relationship(
+        'Score',
+        back_populates='client',
+        cascade='all, delete-orphan',
+    )

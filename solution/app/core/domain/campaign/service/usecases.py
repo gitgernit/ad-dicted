@@ -2,14 +2,25 @@ import uuid
 
 import dishka
 
+from app.core.domain.advertiser.entities.repositories import AdvertiserRepository
 from app.core.domain.campaign.entities.entities import Campaign
 from app.core.domain.campaign.entities.repositories import CampaignRepository
 from app.core.domain.campaign.service.dto import CampaignDTO
 
 
+class AdvertiserNotFoundError(Exception):
+    def __init__(self) -> None:
+        super().__init__('No such advertiser found.')
+
+
 class CampaignUsecase:
-    def __init__(self, campaign_repository: CampaignRepository) -> None:
+    def __init__(
+        self,
+        campaign_repository: CampaignRepository,
+        advertiser_repository: AdvertiserRepository,
+    ) -> None:
         self.campaign_repository = campaign_repository
+        self.advertiser_repository = advertiser_repository
 
     async def create_campaign(
         self,
@@ -17,6 +28,9 @@ class CampaignUsecase:
         *,
         overwrite: bool = False,
     ) -> CampaignDTO:
+        if not await self.advertiser_repository.get_advertiser(dto.advertiser_id):
+            raise AdvertiserNotFoundError
+
         campaign = Campaign(
             impressions_limit=dto.impressions_limit,
             clicks_limit=dto.clicks_limit,
@@ -46,8 +60,11 @@ class CampaignUsecase:
             advertiser_id=new_campaign.advertiser_id,
         )
 
-    async def get_campaign(self, campaign_id: uuid.UUID) -> CampaignDTO:
+    async def get_campaign(self, campaign_id: uuid.UUID) -> CampaignDTO | None:
         campaign = await self.campaign_repository.get_campaign(campaign_id)
+
+        if campaign is None:
+            return None
 
         return CampaignDTO(
             id=campaign.id,
