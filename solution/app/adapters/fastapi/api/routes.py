@@ -5,6 +5,7 @@ import fastapi
 import app.adapters.fastapi.api.advertisers.routes
 import app.adapters.fastapi.api.clients.routes
 from app.adapters.fastapi.api.schemas import ScoreSchema
+import app.adapters.fastapi.api.time.routes
 from app.core.domain.score.service.dto import ScoreDTO
 from app.core.domain.score.service.usecases import AdvertiserNotFoundError
 from app.core.domain.score.service.usecases import ClientNotFoundError
@@ -21,6 +22,10 @@ api_router.include_router(
 api_router.include_router(
     app.adapters.fastapi.api.advertisers.routes.advertisers_router,
     prefix='/advertisers',
+)
+api_router.include_router(
+    app.adapters.fastapi.api.time.routes.time_router,
+    prefix='/time',
 )
 
 

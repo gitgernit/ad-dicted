@@ -36,3 +36,19 @@ class CampaignInputSchema(pydantic.BaseModel):
 class CampaignOutputSchema(CampaignInputSchema):
     campaign_id: uuid.UUID
     advertiser_id: uuid.UUID
+
+
+class CampaignPatchSchema(pydantic.BaseModel):
+    impressions_limit: int | None = pydantic.Field(default=None)
+    clicks_limit: int | None = pydantic.Field(default=None)
+
+    cost_per_impression: float | None = pydantic.Field(default=None)
+    cost_per_click: float | None = pydantic.Field(default=None)
+
+    ad_title: str | None = pydantic.Field(default=None)
+    ad_text: str | None = pydantic.Field(default=None)
+
+    start_date: int | None = pydantic.Field(default=None)
+    end_date: int | None = pydantic.Field(default=None)
+
+    targeting: TargetingSchema | None = pydantic.Field(default=None)

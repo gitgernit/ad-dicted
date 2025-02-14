@@ -7,6 +7,7 @@ import fastapi
 
 from app.adapters.fastapi.api.advertisers.campaigns.schemas import CampaignInputSchema
 from app.adapters.fastapi.api.advertisers.campaigns.schemas import CampaignOutputSchema
+from app.adapters.fastapi.api.advertisers.campaigns.schemas import CampaignPatchSchema
 from app.adapters.fastapi.api.advertisers.campaigns.schemas import TargetingSchema
 from app.core.domain.campaign.service.dto import CampaignDTO
 from app.core.domain.campaign.service.dto import TargetingDTO
@@ -16,11 +17,7 @@ from app.core.domain.campaign.service.usecases import CampaignUsecase
 campaigns_router = fastapi.APIRouter(route_class=DishkaRoute)
 
 
-@campaigns_router.post(
-    '',
-    status_code=fastapi.status.HTTP_201_CREATED,
-    response_model_exclude_unset=True,
-)
+@campaigns_router.post('', status_code=fastapi.status.HTTP_201_CREATED)
 async def create_campaign(
     usecase: FromDishka[CampaignUsecase],
     advertiser_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='advertiserId')],
@@ -84,7 +81,7 @@ async def create_campaign(
     )
 
 
-@campaigns_router.get('/{campaignId}', response_model_exclude_none=True)
+@campaigns_router.get('/{campaignId}')
 async def get_campaign(
     usecase: FromDishka[CampaignUsecase],
     campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='campaignId')],
@@ -121,3 +118,12 @@ async def get_campaign(
         campaign_id=campaign_dto.id,
         advertiser_id=campaign_dto.advertiser_id,
     )
+
+
+async def patch_campaign(
+    usecase: FromDishka[CampaignUsecase],
+    campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='campaignId')],
+    advertiser_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='advertiserId')],
+    patched_schema: CampaignPatchSchema,
+) -> CampaignOutputSchema:
+    pass
