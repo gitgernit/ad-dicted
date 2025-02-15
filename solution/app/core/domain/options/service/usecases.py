@@ -33,7 +33,7 @@ class OptionsUsecase:
                 if current_day_option is not None:
                     current_day = int(current_day_option.value)
 
-                    if new_day > current_day:
+                    if new_day < current_day:
                         raise InvalidDayError
 
         await self.options_repository.set_option(option)

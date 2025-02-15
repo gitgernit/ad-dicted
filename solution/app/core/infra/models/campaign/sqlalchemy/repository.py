@@ -57,9 +57,9 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
                 advertiser_id=new_campaign.advertiser_id,
             )
 
-    async def get_campaign(self, campaign_id: uuid.UUID) -> DomainCampaign | None:
+    async def get_campaign(self, campaign_id: uuid.UUID, advertiser_id: uuid.UUID) -> DomainCampaign | None:
         async with self._session_factory() as session, session.begin():
-            stmt = sqlalchemy.select(Campaign).where(Campaign.id == campaign_id)
+            stmt = sqlalchemy.select(Campaign).where(Campaign.id == campaign_id, Campaign.advertiser_id == advertiser_id)
             result = await session.execute(stmt)
 
             campaign = result.scalars().first()
@@ -80,12 +80,16 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
                 advertiser_id=campaign.advertiser_id,
             )
 
-    async def delete_campaign(self, campaign_id: uuid.UUID) -> None:
+    async def delete_campaign(self, campaign_id: uuid.UUID, advertiser_id: uuid.UUID) -> None:
         async with self._session_factory() as session, session.begin():
-            campaign = await session.get(Campaign, campaign_id)
-            await session.delete(campaign)
+            stmt = await sqlalchemy.select(Campaign).where(Campaign.id == campaign_id, Campaign.advertiser_id == advertiser_id)
+            result = await session.execute(stmt)
 
-            await session.flush()
+            campaign = result.scalars().first()
+
+            if campaign:
+                await session.delete(campaign)
+                await session.flush()
 
     async def get_advertiser_campaigns(
         self,

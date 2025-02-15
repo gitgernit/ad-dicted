@@ -11,7 +11,7 @@ from app.adapters.fastapi.api.advertisers.campaigns.schemas import CampaignPatch
 from app.adapters.fastapi.api.advertisers.campaigns.schemas import TargetingSchema
 from app.core.domain.campaign.service.dto import CampaignDTO
 from app.core.domain.campaign.service.dto import TargetingDTO
-from app.core.domain.campaign.service.usecases import AdvertiserNotFoundError
+from app.core.domain.campaign.service.usecases import AdvertiserNotFoundError, CampaignNotFoundError
 from app.core.domain.campaign.service.usecases import CampaignUsecase
 
 campaigns_router = fastapi.APIRouter(route_class=DishkaRoute)
@@ -85,8 +85,9 @@ async def create_campaign(
 async def get_campaign(
     usecase: FromDishka[CampaignUsecase],
     campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='campaignId')],
+    advertiser_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='advertiserId')],
 ) -> CampaignOutputSchema:
-    campaign_dto = await usecase.get_campaign(campaign_id)
+    campaign_dto = await usecase.get_campaign(campaign_id, advertiser_id)
 
     if campaign_dto is None:
         raise fastapi.HTTPException(
@@ -120,10 +121,17 @@ async def get_campaign(
     )
 
 
-async def patch_campaign(
+@campaigns_router.delete('/{campaignId}', status_code=fastapi.status.HTTP_204_NO_CONTENT)
+async def delete_campaign(
     usecase: FromDishka[CampaignUsecase],
     campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='campaignId')],
     advertiser_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='advertiserId')],
-    patched_schema: CampaignPatchSchema,
-) -> CampaignOutputSchema:
-    pass
+) -> None:
+    try:
+        await usecase.delete_campaign(campaign_id, advertiser_id)
+
+    except CampaignNotFoundError as error:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='No such campaign found.'
+        ) from error

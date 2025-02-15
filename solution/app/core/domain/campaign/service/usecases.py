@@ -13,6 +13,11 @@ class AdvertiserNotFoundError(Exception):
         super().__init__('No such advertiser found.')
 
 
+class CampaignNotFoundError(Exception):
+    def __init__(self) -> None:
+        super().__init__('No such campaign found.')
+
+
 class CampaignUsecase:
     def __init__(
         self,
@@ -60,8 +65,8 @@ class CampaignUsecase:
             advertiser_id=new_campaign.advertiser_id,
         )
 
-    async def get_campaign(self, campaign_id: uuid.UUID) -> CampaignDTO | None:
-        campaign = await self.campaign_repository.get_campaign(campaign_id)
+    async def get_campaign(self, campaign_id: uuid.UUID, advertiser_id: uuid.UUID) -> CampaignDTO | None:
+        campaign = await self.campaign_repository.get_campaign(campaign_id, advertiser_id)
 
         if campaign is None:
             return None
@@ -124,8 +129,11 @@ class CampaignUsecase:
             advertiser_id=new_campaign.advertiser_id,
         )
 
-    async def delete_campaign(self, campaign_id: uuid.UUID) -> None:
-        await self.campaign_repository.delete_campaign(campaign_id)
+    async def delete_campaign(self, campaign_id: uuid.UUID, advertiser_id: uuid.UUID) -> None:
+        if self.campaign_repository.get_campaign(campaign_id, advertiser_id) is None:
+            return CampaignNotFoundError
+
+        await self.campaign_repository.delete_campaign(campaign_id, advertiser_id)
 
     async def get_advertiser_campaigns(
         self,

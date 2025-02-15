@@ -15,11 +15,11 @@ class CampaignRepository(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def get_campaign(self, campaign_id: uuid.UUID) -> Campaign | None:
+    async def get_campaign(self, campaign_id: uuid.UUID, advertiser_id: uuid.UUID) -> Campaign | None:
         pass
 
     @abc.abstractmethod
-    async def delete_campaign(self, campaign_id: uuid.UUID) -> None:
+    async def delete_campaign(self, campaign_id: uuid.UUID, advertiser_id: uuid.UUID) -> None:
         pass
 
     @abc.abstractmethod
