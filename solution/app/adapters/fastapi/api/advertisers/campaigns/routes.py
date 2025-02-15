@@ -82,6 +82,42 @@ async def create_campaign(
     )
 
 
+@campaigns_router.get('')
+async def get_campaigns(
+    usecase: FromDishka[CampaignUsecase],
+    advertiser_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='advertiserId')],
+    size: int | None = None,
+    page: int | None = 0,
+) -> list[CampaignOutputSchema]:
+    campaigns = await usecase.get_advertiser_campaigns(
+        advertiser_id, limit=size, offset=(size if size else 0) * page,
+    )
+
+    return [
+        CampaignOutputSchema(
+            impressions_limit=campaign_dto.impressions_limit,
+            clicks_limit=campaign_dto.clicks_limit,
+            cost_per_impression=campaign_dto.cost_per_impression,
+            cost_per_click=campaign_dto.cost_per_click,
+            ad_title=campaign_dto.ad_title,
+            ad_text=campaign_dto.ad_text,
+            start_date=campaign_dto.start_date,
+            end_date=campaign_dto.end_date,
+            targeting=TargetingSchema(
+                gender=campaign_dto.targeting.gender,
+                age_from=campaign_dto.targeting.age_from,
+                age_to=campaign_dto.targeting.age_to,
+                location=campaign_dto.targeting.location,
+            )
+            if campaign_dto.targeting
+            else None,
+            campaign_id=campaign_dto.id,
+            advertiser_id=campaign_dto.advertiser_id,
+        )
+        for campaign_dto in campaigns
+    ]
+
+
 @campaigns_router.get('/{campaignId}')
 async def get_campaign(
     usecase: FromDishka[CampaignUsecase],
