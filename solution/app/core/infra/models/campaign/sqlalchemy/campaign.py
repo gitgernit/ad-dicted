@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 import sqlalchemy as sa
@@ -24,6 +25,11 @@ class Campaign(Base):
 
     start_date: Mapped[int] = mapped_column(sa.Integer, nullable=False)
     end_date: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        sa.DateTime(timezone=True),
+        server_default=sa.sql.func.now(),
+    )
 
     advertiser_id: Mapped[uuid.UUID] = mapped_column(
         sa.UUID,

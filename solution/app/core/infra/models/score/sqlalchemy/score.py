@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 import sqlalchemy as sa
@@ -22,6 +23,11 @@ class Score(Base):
         nullable=False,
     )
     score: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        sa.DateTime(timezone=True),
+        server_default=sa.sql.func.now(),
+    )
 
     client = relationship('Client', back_populates='scores')
     advertiser = relationship('Advertiser', back_populates='scores')

@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 import sqlalchemy as sa
@@ -17,6 +18,11 @@ class Advertiser(Base):
         unique=True,
     )
     name: Mapped[str] = mapped_column(sa.String, nullable=False)
+
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        sa.DateTime(timezone=True),
+        server_default=sa.sql.func.now(),
+    )
 
     scores: Mapped[list['Score']] = relationship(
         'Score',

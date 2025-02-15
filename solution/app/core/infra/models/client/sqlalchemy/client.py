@@ -1,3 +1,4 @@
+import datetime
 import enum
 import uuid
 
@@ -26,6 +27,11 @@ class Client(Base):
     age: Mapped[int] = mapped_column(sa.Integer, nullable=False)
     location: Mapped[str] = mapped_column(sa.String, nullable=False)
     gender: Mapped[Gender] = mapped_column(sa.Enum(Gender), nullable=False)
+
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        sa.DateTime(timezone=True),
+        server_default=sa.sql.func.now(),
+    )
 
     scores: Mapped[list['Score']] = relationship(
         'Score',
