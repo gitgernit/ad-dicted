@@ -36,6 +36,9 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
                 advertiser_id=campaign.advertiser_id,
             )
 
+            if campaign.id is not None:
+                new_campaign.id = campaign.id
+
             if overwrite:
                 new_campaign = await session.merge(new_campaign)
 
@@ -57,9 +60,16 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
                 advertiser_id=new_campaign.advertiser_id,
             )
 
-    async def get_campaign(self, campaign_id: uuid.UUID, advertiser_id: uuid.UUID) -> DomainCampaign | None:
+    async def get_campaign(
+        self,
+        campaign_id: uuid.UUID,
+        advertiser_id: uuid.UUID,
+    ) -> DomainCampaign | None:
         async with self._session_factory() as session, session.begin():
-            stmt = sqlalchemy.select(Campaign).where(Campaign.id == campaign_id, Campaign.advertiser_id == advertiser_id)
+            stmt = sqlalchemy.select(Campaign).where(
+                Campaign.id == campaign_id,
+                Campaign.advertiser_id == advertiser_id,
+            )
             result = await session.execute(stmt)
 
             campaign = result.scalars().first()
@@ -80,9 +90,16 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
                 advertiser_id=campaign.advertiser_id,
             )
 
-    async def delete_campaign(self, campaign_id: uuid.UUID, advertiser_id: uuid.UUID) -> None:
+    async def delete_campaign(
+        self,
+        campaign_id: uuid.UUID,
+        advertiser_id: uuid.UUID,
+    ) -> None:
         async with self._session_factory() as session, session.begin():
-            stmt = await sqlalchemy.select(Campaign).where(Campaign.id == campaign_id, Campaign.advertiser_id == advertiser_id)
+            stmt = sqlalchemy.select(Campaign).where(
+                Campaign.id == campaign_id,
+                Campaign.advertiser_id == advertiser_id,
+            )
             result = await session.execute(stmt)
 
             campaign = result.scalars().first()

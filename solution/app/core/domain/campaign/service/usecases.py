@@ -4,8 +4,12 @@ import dishka
 
 from app.core.domain.advertiser.entities.repositories import AdvertiserRepository
 from app.core.domain.campaign.entities.entities import Campaign
+from app.core.domain.campaign.entities.entities import Targeting
 from app.core.domain.campaign.entities.repositories import CampaignRepository
 from app.core.domain.campaign.service.dto import CampaignDTO
+from app.core.domain.campaign.service.dto import TargetingDTO
+from app.core.domain.options.entities.entities import AvailableOptions
+from app.core.domain.options.entities.repositories import OptionsRepository
 
 
 class AdvertiserNotFoundError(Exception):
@@ -18,14 +22,21 @@ class CampaignNotFoundError(Exception):
         super().__init__('No such campaign found.')
 
 
+class InvalidCampaignError(Exception):
+    def __init__(self) -> None:
+        super().__init__('Campaign was given invalid fields.')
+
+
 class CampaignUsecase:
     def __init__(
         self,
         campaign_repository: CampaignRepository,
         advertiser_repository: AdvertiserRepository,
+        options_repository: OptionsRepository,
     ) -> None:
         self.campaign_repository = campaign_repository
         self.advertiser_repository = advertiser_repository
+        self.options_repository = options_repository
 
     async def create_campaign(
         self,
@@ -65,8 +76,15 @@ class CampaignUsecase:
             advertiser_id=new_campaign.advertiser_id,
         )
 
-    async def get_campaign(self, campaign_id: uuid.UUID, advertiser_id: uuid.UUID) -> CampaignDTO | None:
-        campaign = await self.campaign_repository.get_campaign(campaign_id, advertiser_id)
+    async def get_campaign(
+        self,
+        campaign_id: uuid.UUID,
+        advertiser_id: uuid.UUID,
+    ) -> CampaignDTO | None:
+        campaign = await self.campaign_repository.get_campaign(
+            campaign_id,
+            advertiser_id,
+        )
 
         if campaign is None:
             return None
@@ -87,8 +105,15 @@ class CampaignUsecase:
     async def patch_campaign(
         self,
         campaign_id: uuid.UUID,
+        advertiser_id: uuid.UUID,
         new_campaign_dto: CampaignDTO,
     ) -> CampaignDTO:
+        if (
+            await self.campaign_repository.get_campaign(campaign_id, advertiser_id)
+            is None
+        ):
+            raise CampaignNotFoundError
+
         campaign = Campaign(
             impressions_limit=new_campaign_dto.impressions_limit,
             clicks_limit=new_campaign_dto.clicks_limit,
@@ -99,16 +124,39 @@ class CampaignUsecase:
             start_date=new_campaign_dto.start_date,
             end_date=new_campaign_dto.end_date,
             advertiser_id=new_campaign_dto.advertiser_id,
+            targeting=Targeting(
+                gender=new_campaign_dto.targeting.gender,
+                age_from=new_campaign_dto.targeting.age_from,
+                age_to=new_campaign_dto.targeting.age_to,
+                location=new_campaign_dto.targeting.location,
+            )
+            if new_campaign_dto.targeting
+            else None,
         )
-        existing_campaign = await self.campaign_repository.get_campaign(campaign_id)
+        existing_campaign = await self.campaign_repository.get_campaign(
+            campaign_id,
+            advertiser_id,
+        )
+        started = await self._campaign_started(campaign_id, advertiser_id)
 
-        campaign_dict = campaign.model_dump()
+        if (
+            (
+                campaign.impressions_limit != existing_campaign.impressions_limit
+                and started
+            )
+            or (campaign.clicks_limit != existing_campaign.clicks_limit and started)
+            or (campaign.start_date != existing_campaign.start_date and started)
+            or (campaign.end_date != existing_campaign.end_date and started)
+        ):
+            raise InvalidCampaignError
+
+        campaign_dict = campaign.model_dump(exclude={'id'})
         existing_campaign_dict = existing_campaign.model_dump(
             exclude_none=True,
             exclude_unset=True,
         )
 
-        new_campaign_dict = campaign_dict | existing_campaign_dict
+        new_campaign_dict = existing_campaign_dict | campaign_dict
         new_campaign = Campaign(**new_campaign_dict)
 
         new_campaign = await self.campaign_repository.create_campaign(
@@ -127,11 +175,23 @@ class CampaignUsecase:
             start_date=new_campaign.start_date,
             end_date=new_campaign.end_date,
             advertiser_id=new_campaign.advertiser_id,
+            targeting=TargetingDTO(
+                gender=new_campaign.targeting.gender,
+                age_from=new_campaign.targeting.age_from,
+                age_to=new_campaign.targeting.age_to,
+                location=new_campaign.targeting.location,
+            )
+            if new_campaign.targeting
+            else None,
         )
 
-    async def delete_campaign(self, campaign_id: uuid.UUID, advertiser_id: uuid.UUID) -> None:
+    async def delete_campaign(
+        self,
+        campaign_id: uuid.UUID,
+        advertiser_id: uuid.UUID,
+    ) -> None:
         if self.campaign_repository.get_campaign(campaign_id, advertiser_id) is None:
-            return CampaignNotFoundError
+            raise CampaignNotFoundError
 
         await self.campaign_repository.delete_campaign(campaign_id, advertiser_id)
 
@@ -162,6 +222,21 @@ class CampaignUsecase:
             )
             for campaign in campaigns
         ]
+
+    async def _campaign_started(
+        self,
+        campaign_id: uuid.UUID,
+        advertiser_id: uuid.UUID,
+    ) -> bool:
+        campaign = await self.campaign_repository.get_campaign(
+            campaign_id,
+            advertiser_id,
+        )
+        current_day = int(
+            (await self.options_repository.get_option(AvailableOptions.DAY)).value,
+        )
+
+        return current_day >= campaign.start_date
 
 
 usecase_provider = dishka.Provider(scope=dishka.Scope.REQUEST)

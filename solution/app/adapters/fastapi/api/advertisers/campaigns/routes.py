@@ -7,12 +7,13 @@ import fastapi
 
 from app.adapters.fastapi.api.advertisers.campaigns.schemas import CampaignInputSchema
 from app.adapters.fastapi.api.advertisers.campaigns.schemas import CampaignOutputSchema
-from app.adapters.fastapi.api.advertisers.campaigns.schemas import CampaignPatchSchema
 from app.adapters.fastapi.api.advertisers.campaigns.schemas import TargetingSchema
 from app.core.domain.campaign.service.dto import CampaignDTO
 from app.core.domain.campaign.service.dto import TargetingDTO
-from app.core.domain.campaign.service.usecases import AdvertiserNotFoundError, CampaignNotFoundError
+from app.core.domain.campaign.service.usecases import AdvertiserNotFoundError
+from app.core.domain.campaign.service.usecases import CampaignNotFoundError
 from app.core.domain.campaign.service.usecases import CampaignUsecase
+from app.core.domain.campaign.service.usecases import InvalidCampaignError
 
 campaigns_router = fastapi.APIRouter(route_class=DishkaRoute)
 
@@ -121,7 +122,10 @@ async def get_campaign(
     )
 
 
-@campaigns_router.delete('/{campaignId}', status_code=fastapi.status.HTTP_204_NO_CONTENT)
+@campaigns_router.delete(
+    '/{campaignId}',
+    status_code=fastapi.status.HTTP_204_NO_CONTENT,
+)
 async def delete_campaign(
     usecase: FromDishka[CampaignUsecase],
     campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='campaignId')],
@@ -133,5 +137,73 @@ async def delete_campaign(
     except CampaignNotFoundError as error:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
-            detail='No such campaign found.'
+            detail='No such campaign found.',
         ) from error
+
+
+@campaigns_router.put('/{campaignId}')
+async def put_campaign(
+    usecase: FromDishka[CampaignUsecase],
+    campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='campaignId')],
+    advertiser_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='advertiserId')],
+    campaign: CampaignInputSchema,
+) -> CampaignOutputSchema:
+    campaign_dto = CampaignDTO(
+        advertiser_id=advertiser_id,
+        impressions_limit=campaign.impressions_limit,
+        clicks_limit=campaign.clicks_limit,
+        cost_per_impression=campaign.cost_per_impression,
+        cost_per_click=campaign.cost_per_click,
+        ad_title=campaign.ad_title,
+        ad_text=campaign.ad_text,
+        start_date=campaign.start_date,
+        end_date=campaign.end_date,
+        targeting=TargetingDTO(
+            gender=campaign.targeting.gender,
+            age_from=campaign.targeting.age_from,
+            age_to=campaign.targeting.age_to,
+            location=campaign.targeting.location,
+        )
+        if campaign.targeting
+        else None,
+    )
+
+    try:
+        new_campaign_dto = await usecase.patch_campaign(
+            campaign_id,
+            advertiser_id,
+            campaign_dto,
+        )
+
+    except InvalidCampaignError as error:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail='Invalid new fields passed.',
+        ) from error
+
+    except CampaignNotFoundError as error:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='No such campaign found.',
+        ) from error
+
+    return CampaignOutputSchema(
+        impressions_limit=new_campaign_dto.impressions_limit,
+        clicks_limit=new_campaign_dto.clicks_limit,
+        cost_per_impression=new_campaign_dto.cost_per_impression,
+        cost_per_click=new_campaign_dto.cost_per_click,
+        ad_title=new_campaign_dto.ad_title,
+        ad_text=new_campaign_dto.ad_text,
+        start_date=new_campaign_dto.start_date,
+        end_date=new_campaign_dto.end_date,
+        targeting=TargetingSchema(
+            gender=new_campaign_dto.targeting.gender,
+            age_from=new_campaign_dto.targeting.age_from,
+            age_to=new_campaign_dto.targeting.age_to,
+            location=new_campaign_dto.targeting.location,
+        )
+        if new_campaign_dto.targeting
+        else None,
+        campaign_id=new_campaign_dto.id,
+        advertiser_id=new_campaign_dto.advertiser_id,
+    )
