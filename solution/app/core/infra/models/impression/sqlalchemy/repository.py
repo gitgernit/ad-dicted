@@ -3,7 +3,9 @@ import uuid
 import dishka
 import sqlalchemy.ext.asyncio
 
-from app.core.domain.feed.entities.entities import CampaignImpression as DomainImpression
+from app.core.domain.feed.entities.entities import (
+    CampaignImpression as DomainImpression,
+)
 from app.core.domain.feed.entities.repositories import ImpressionsRepository
 from app.core.infra.models.impression.sqlalchemy.impression import Impression
 
