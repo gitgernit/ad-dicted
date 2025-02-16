@@ -8,15 +8,15 @@ import fastapi
 from app.adapters.fastapi.api.stats.schemas import CampaignStatsSchema
 from app.core.domain.stats.service.usecases import StatsUsecase
 
-campaigns_router = fastapi.APIRouter(route_class=DishkaRoute)
+advertisers_router = fastapi.APIRouter(route_class=DishkaRoute)
 
 
-@campaigns_router.get('/{campaignId}')
-async def get_campaign_stats(
+@advertisers_router.get('/{advertiserId}/campaigns')
+async def total_advertiser_campaigns_stats(
     usecase: FromDishka[StatsUsecase],
-    campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='campaignId')],
+    advertiser_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='advertiserId')],
 ) -> CampaignStatsSchema:
-    stats_dto = await usecase.get_total_campaign_stats(campaign_id)
+    stats_dto = await usecase.get_total_advertisers_campaigns_stats(advertiser_id)
 
     return CampaignStatsSchema(
         impressions_count=stats_dto.impressions_count,
@@ -28,12 +28,12 @@ async def get_campaign_stats(
     )
 
 
-@campaigns_router.get('/{campaignId}/daily')
-async def get_dailyy_campaign_stats(
+@advertisers_router.get('/{advertiserId}/campaigns/daily')
+async def daily_advertiser_campaigns_stats(
     usecase: FromDishka[StatsUsecase],
-    campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='campaignId')],
+    advertiser_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='advertiserId')],
 ) -> list[CampaignStatsSchema]:
-    daily_stats_dto = await usecase.get_daily_campaign_stats(campaign_id)
+    daily_stats_dto = await usecase.get_daily_advertiser_campaign_stats(advertiser_id)
 
     return [
         CampaignStatsSchema(

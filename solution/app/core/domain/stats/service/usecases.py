@@ -1,3 +1,4 @@
+import itertools
 import uuid
 
 import dishka
@@ -42,7 +43,7 @@ class StatsUsecase:
         )
         clicks = await self.clicks_repository.get_campaign_clicks(campaign_id, day)
 
-        conversion = len(clicks) / len(impressions) * 100
+        conversion = len(clicks) / len(impressions) * 100 if impressions else 0
 
         spent_impressions = 0
         spent_clicks = 0
@@ -101,12 +102,97 @@ class StatsUsecase:
 
         total_stats.conversion = (
             total_stats.clicks_count / total_stats.impressions_count * 100
+            if total_stats.impressions_count
+            else 0
         )
         total_stats.spent_total = (
             total_stats.spent_clicks + total_stats.spent_impressions
         )
 
         return total_stats
+
+    async def get_total_advertisers_campaigns_stats(
+        self,
+        advertiser_id: uuid.UUID,
+    ) -> CampaignStatsDTO:
+        campaigns = await self.campaign_repository.get_advertiser_campaigns(
+            advertiser_id,
+        )
+
+        stats = CampaignStatsDTO(
+            impressions_count=0,
+            clicks_count=0,
+            conversion=0,
+            spent_impressions=0,
+            spent_clicks=0,
+            spent_total=0,
+        )
+
+        for campaign in campaigns:
+            stat = await self.get_total_campaign_stats(campaign.id)
+
+            stats.impressions_count += stat.impressions_count
+            stats.clicks_count += stat.clicks_count
+
+            stats.spent_impressions += stat.spent_impressions
+            stats.spent_clicks += stat.spent_clicks
+
+        stats.conversion = (
+            stats.clicks_count / stats.impressions_count * 100
+            if stats.impressions_count
+            else 0
+        )
+        stats.spent_total = stats.spent_impressions + stats.spent_clicks
+
+        return stats
+
+    async def get_daily_advertiser_campaign_stats(
+        self,
+        advertiser_id: uuid.UUID,
+    ) -> list[CampaignStatsDTO]:
+        campaigns = await self.campaign_repository.get_advertiser_campaigns(
+            advertiser_id,
+        )
+        daily_campaign_stats: list[tuple[CampaignStatsDTO]] = list(
+            itertools.groupby(
+                [
+                    await self.get_daily_campaign_stats(campaign.id)
+                    for campaign in campaigns
+                ],
+                key=lambda stats: stats.day,
+            ),
+        )
+        daily_advertiser_stats = []
+
+        for stats in daily_campaign_stats:
+            total_stat = CampaignStatsDTO(
+                impressions_count=0,
+                clicks_count=0,
+                conversion=0,
+                spent_impressions=0,
+                spent_clicks=0,
+                spent_total=0,
+            )
+
+            for stat in stats:
+                total_stat.impressions_count += stat.impressions_count
+                total_stat.clicks_count += stat.clicks_count
+
+                total_stat.spent_impressions += stat.spent_impressions
+                total_stat.spent_clicks += stat.spent_clicks
+
+            total_stat.conversion = (
+                total_stat.clicks_count / total_stat.impressions_count * 100
+                if total_stat.impressions_count
+                else 0
+            )
+            total_stat.spent_total = (
+                total_stat.spent_impressions + total_stat.spent_clicks
+            )
+
+            daily_advertiser_stats.append(total_stat)
+
+        return daily_advertiser_stats
 
 
 usecase_provider = dishka.Provider(scope=dishka.Scope.REQUEST)

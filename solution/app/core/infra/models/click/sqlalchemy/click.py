@@ -30,5 +30,5 @@ class Click(Base):
         nullable=False,
     )
 
-    client = relationship('Client', back_populates='impressions')
-    campaign = relationship('Campaign', back_populates='impressions')
+    client = relationship('Client', back_populates='clicks')
+    campaign = relationship('Campaign', back_populates='clicks')

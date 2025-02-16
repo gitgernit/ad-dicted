@@ -42,3 +42,7 @@ class Client(Base):
         'Impression',
         back_populates='client',
     )
+    clicks: Mapped[list['Click']] = relationship(
+        'Click',
+        back_populates='client',
+    )

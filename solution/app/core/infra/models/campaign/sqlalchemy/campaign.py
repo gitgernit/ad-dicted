@@ -65,3 +65,7 @@ class Campaign(Base):
         'Impression',
         back_populates='campaign',
     )
+    clicks: Mapped[list['Click']] = relationship(
+        'Click',
+        back_populates='campaign',
+    )
