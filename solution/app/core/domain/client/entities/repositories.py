@@ -10,5 +10,5 @@ class ClientRepository(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def get_client(self, client_id: uuid.UUID) -> Client:
+    async def get_client(self, client_id: uuid.UUID) -> Client | None:
         pass

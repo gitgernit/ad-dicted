@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 from app.core.infra.models.sqlalchemy import Base
 
 
-class Gender(enum.Enum):
+class ClientGender(enum.Enum):
     MALE = 'MALE'
     FEMALE = 'FEMALE'
 
@@ -26,7 +26,7 @@ class Client(Base):
     login: Mapped[str] = mapped_column(sa.String, nullable=False, unique=True)
     age: Mapped[int] = mapped_column(sa.Integer, nullable=False)
     location: Mapped[str] = mapped_column(sa.String, nullable=False)
-    gender: Mapped[Gender] = mapped_column(sa.Enum(Gender), nullable=False)
+    gender: Mapped[ClientGender] = mapped_column(sa.Enum(ClientGender), nullable=False)
 
     created_at: Mapped[datetime.datetime] = mapped_column(
         sa.DateTime(timezone=True),
@@ -37,4 +37,8 @@ class Client(Base):
         'Score',
         back_populates='client',
         cascade='all, delete-orphan',
+    )
+    impressions: Mapped[list['Impression']] = relationship(
+        'Impression',
+        back_populates='client',
     )

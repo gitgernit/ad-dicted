@@ -1,4 +1,5 @@
 import datetime
+import enum
 import uuid
 
 import sqlalchemy as sa
@@ -7,6 +8,12 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from app.core.infra.models.sqlalchemy import Base
+
+
+class CampaignGender(enum.StrEnum):
+    MALE = 'MALE'
+    FEMALE = 'FEMALE'
+    ALL = 'ALL'
 
 
 class Campaign(Base):
@@ -39,4 +46,22 @@ class Campaign(Base):
     advertiser: Mapped['Advertiser'] = relationship(
         'Advertiser',
         back_populates='campaigns',
+    )
+
+    gender: Mapped[CampaignGender | None] = mapped_column(
+        sa.Enum(CampaignGender),
+        default=None,
+        nullable=True,
+    )
+    age_from: Mapped[int | None] = mapped_column(
+        sa.Integer,
+        default=None,
+        nullable=True,
+    )
+    age_to: Mapped[int | None] = mapped_column(sa.Integer, default=None, nullable=True)
+    location: Mapped[str | None] = mapped_column(sa.String, default=None, nullable=True)
+
+    impressions: Mapped[list['Impression']] = relationship(
+        'Impression',
+        back_populates='campaign',
     )

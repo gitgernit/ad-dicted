@@ -4,8 +4,11 @@ import dishka
 import sqlalchemy.ext.asyncio
 
 from app.core.domain.campaign.entities.entities import Campaign as DomainCampaign
+from app.core.domain.campaign.entities.entities import Targeting as DomainTargeting
 from app.core.domain.campaign.entities.repositories import CampaignRepository
+from app.core.domain.client.entities.entities import Gender as DomainGender
 from app.core.infra.models.campaign.sqlalchemy.campaign import Campaign
+from app.core.infra.models.campaign.sqlalchemy.campaign import CampaignGender
 
 
 class SQLAlchemyCampaignRepository(CampaignRepository):
@@ -36,6 +39,12 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
                 advertiser_id=campaign.advertiser_id,
             )
 
+            if campaign.targeting:
+                new_campaign.gender = campaign.targeting.gender
+                new_campaign.age_from = campaign.targeting.age_from
+                new_campaign.age_to = campaign.targeting.age_to
+                new_campaign.location = campaign.targeting.location
+
             if campaign.id is not None:
                 new_campaign.id = campaign.id
 
@@ -46,6 +55,13 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
 
             await session.flush()
             session.expunge_all()
+
+            targeting_options = {
+                'gender': new_campaign.gender,
+                'age_from': new_campaign.age_from,
+                'age_to': new_campaign.age_to,
+                'location': new_campaign.location,
+            }
 
             return DomainCampaign(
                 id=new_campaign.id,
@@ -58,24 +74,32 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
                 start_date=new_campaign.start_date,
                 end_date=new_campaign.end_date,
                 advertiser_id=new_campaign.advertiser_id,
+                targeting=DomainTargeting(
+                    **targeting_options,
+                )
+                if any(list(targeting_options.values()))
+                else None,
             )
 
     async def get_campaign(
         self,
         campaign_id: uuid.UUID,
-        advertiser_id: uuid.UUID,
     ) -> DomainCampaign | None:
         async with self._session_factory() as session, session.begin():
-            stmt = sqlalchemy.select(Campaign).where(
-                Campaign.id == campaign_id,
-                Campaign.advertiser_id == advertiser_id,
-            )
+            stmt = sqlalchemy.select(Campaign).where(Campaign.id == campaign_id)
             result = await session.execute(stmt)
 
             campaign = result.scalars().first()
 
             if campaign is None:
                 return None
+
+            targeting_options = {
+                'gender': campaign.gender,
+                'age_from': campaign.age_from,
+                'age_to': campaign.age_to,
+                'location': campaign.location,
+            }
 
             return DomainCampaign(
                 id=campaign.id,
@@ -88,6 +112,11 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
                 start_date=campaign.start_date,
                 end_date=campaign.end_date,
                 advertiser_id=campaign.advertiser_id,
+                targeting=DomainTargeting(
+                    **targeting_options,
+                )
+                if any(list(targeting_options.values()))
+                else None,
             )
 
     async def delete_campaign(
@@ -125,21 +154,94 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
             result = await session.execute(stmt)
             campaigns = result.scalars().all()
 
-            return [
-                DomainCampaign(
-                    id=campaign.id,
-                    impressions_limit=campaign.impressions_limit,
-                    clicks_limit=campaign.clicks_limit,
-                    cost_per_impression=campaign.cost_per_impression,
-                    cost_per_click=campaign.cost_per_click,
-                    ad_title=campaign.ad_title,
-                    ad_text=campaign.ad_text,
-                    start_date=campaign.start_date,
-                    end_date=campaign.end_date,
-                    advertiser_id=campaign.advertiser_id,
+            output = []
+
+            for campaign in campaigns:
+                targeting_options = {
+                    'gender': campaign.gender,
+                    'age_from': campaign.age_from,
+                    'age_to': campaign.age_to,
+                    'location': campaign.location,
+                }
+
+                output.append(
+                    DomainCampaign(
+                        id=campaign.id,
+                        impressions_limit=campaign.impressions_limit,
+                        clicks_limit=campaign.clicks_limit,
+                        cost_per_impression=campaign.cost_per_impression,
+                        cost_per_click=campaign.cost_per_click,
+                        ad_title=campaign.ad_title,
+                        ad_text=campaign.ad_text,
+                        start_date=campaign.start_date,
+                        end_date=campaign.end_date,
+                        advertiser_id=campaign.advertiser_id,
+                        targeting=DomainTargeting(
+                            **targeting_options,
+                        )
+                        if any(list(targeting_options.values()))
+                        else None,
+                    ),
                 )
-                for campaign in campaigns
-            ]
+
+        return output
+
+    async def get_targeted_campaigns(
+        self,
+        age: int,
+        location: str,
+        gender: DomainGender,
+    ) -> list[DomainCampaign]:
+        async with self._session_factory() as session, session.begin():
+            stmt = sqlalchemy.select(Campaign).where(
+                sqlalchemy.or_(
+                    Campaign.gender is None,
+                    Campaign.gender == CampaignGender.ALL,
+                    Campaign.gender == gender,
+                ),
+                sqlalchemy.or_(Campaign.age_from is None, Campaign.age_from <= age),
+                sqlalchemy.or_(Campaign.age_to is None, Campaign.age_to >= age),
+                sqlalchemy.or_(
+                    Campaign.location is None,
+                    Campaign.location == location,
+                ),
+            )
+            result = await session.execute(stmt)
+            campaigns = result.scalars().all()
+
+            session.expunge_all()
+
+            output = []
+
+            for campaign in campaigns:
+                targeting_options = {
+                    'gender': campaign.gender,
+                    'age_from': campaign.age_from,
+                    'age_to': campaign.age_to,
+                    'location': campaign.location,
+                }
+
+                output.append(
+                    DomainCampaign(
+                        id=campaign.id,
+                        impressions_limit=campaign.impressions_limit,
+                        clicks_limit=campaign.clicks_limit,
+                        cost_per_impression=campaign.cost_per_impression,
+                        cost_per_click=campaign.cost_per_click,
+                        ad_title=campaign.ad_title,
+                        ad_text=campaign.ad_text,
+                        start_date=campaign.start_date,
+                        end_date=campaign.end_date,
+                        advertiser_id=campaign.advertiser_id,
+                        targeting=DomainTargeting(
+                            **targeting_options,
+                        )
+                        if any(list(targeting_options.values()))
+                        else None,
+                    ),
+                )
+
+        return output
 
 
 repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)

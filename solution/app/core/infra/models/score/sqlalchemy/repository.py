@@ -51,7 +51,7 @@ class SQLAlchemyScoreRepository(ScoreRepository):
     ) -> DomainScore | None:
         async with self._session_factory() as session, session.begin():
             stmt = sqlalchemy.select(Score).where(
-                Score.user_id == user_id,
+                Score.client_id == user_id,
                 Score.advertiser_id == advertiser_id,
             )
             result = await session.execute(stmt)

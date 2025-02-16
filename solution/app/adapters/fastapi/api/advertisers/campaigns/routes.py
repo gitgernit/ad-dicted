@@ -90,7 +90,9 @@ async def get_campaigns(
     page: int | None = 0,
 ) -> list[CampaignOutputSchema]:
     campaigns = await usecase.get_advertiser_campaigns(
-        advertiser_id, limit=size, offset=(size if size else 0) * page,
+        advertiser_id,
+        limit=size,
+        offset=(size if size else 0) * page,
     )
 
     return [
@@ -124,7 +126,7 @@ async def get_campaign(
     campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='campaignId')],
     advertiser_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='advertiserId')],
 ) -> CampaignOutputSchema:
-    campaign_dto = await usecase.get_campaign(campaign_id, advertiser_id)
+    campaign_dto = await usecase.get_campaign(campaign_id)
 
     if campaign_dto is None:
         raise fastapi.HTTPException(
@@ -207,7 +209,6 @@ async def put_campaign(
     try:
         new_campaign_dto = await usecase.patch_campaign(
             campaign_id,
-            advertiser_id,
             campaign_dto,
         )
 

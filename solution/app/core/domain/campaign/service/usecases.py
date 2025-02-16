@@ -57,6 +57,14 @@ class CampaignUsecase:
             start_date=dto.start_date,
             end_date=dto.end_date,
             advertiser_id=dto.advertiser_id,
+            targeting=Targeting(
+                gender=dto.targeting.gender,
+                age_from=dto.targeting.age_from,
+                age_to=dto.targeting.age_to,
+                location=dto.targeting.location,
+            )
+            if dto.targeting
+            else None,
         )
         new_campaign = await self.campaign_repository.create_campaign(
             campaign,
@@ -74,16 +82,22 @@ class CampaignUsecase:
             start_date=new_campaign.start_date,
             end_date=new_campaign.end_date,
             advertiser_id=new_campaign.advertiser_id,
+            targeting=TargetingDTO(
+                gender=new_campaign.targeting.gender,
+                age_from=new_campaign.targeting.age_from,
+                age_to=new_campaign.targeting.age_to,
+                location=new_campaign.targeting.location,
+            )
+            if new_campaign.targeting
+            else None,
         )
 
     async def get_campaign(
         self,
         campaign_id: uuid.UUID,
-        advertiser_id: uuid.UUID,
     ) -> CampaignDTO | None:
         campaign = await self.campaign_repository.get_campaign(
             campaign_id,
-            advertiser_id,
         )
 
         if campaign is None:
@@ -100,18 +114,22 @@ class CampaignUsecase:
             start_date=campaign.start_date,
             end_date=campaign.end_date,
             advertiser_id=campaign.advertiser_id,
+            targeting=TargetingDTO(
+                gender=campaign.targeting.gender,
+                age_from=campaign.targeting.age_from,
+                age_to=campaign.targeting.age_to,
+                location=campaign.targeting.location,
+            )
+            if campaign.targeting
+            else None,
         )
 
     async def patch_campaign(
         self,
         campaign_id: uuid.UUID,
-        advertiser_id: uuid.UUID,
         new_campaign_dto: CampaignDTO,
     ) -> CampaignDTO:
-        if (
-            await self.campaign_repository.get_campaign(campaign_id, advertiser_id)
-            is None
-        ):
+        if await self.campaign_repository.get_campaign(campaign_id) is None:
             raise CampaignNotFoundError
 
         campaign = Campaign(
@@ -135,9 +153,10 @@ class CampaignUsecase:
         )
         existing_campaign = await self.campaign_repository.get_campaign(
             campaign_id,
-            advertiser_id,
         )
-        started = await self._campaign_started(campaign_id, advertiser_id)
+        started = await campaign.started(
+            int((await self.options_repository.get_option(AvailableOptions.DAY)).value),
+        )
 
         if (
             (
@@ -190,7 +209,7 @@ class CampaignUsecase:
         campaign_id: uuid.UUID,
         advertiser_id: uuid.UUID,
     ) -> None:
-        if self.campaign_repository.get_campaign(campaign_id, advertiser_id) is None:
+        if self.campaign_repository.get_campaign(campaign_id) is None:
             raise CampaignNotFoundError
 
         await self.campaign_repository.delete_campaign(campaign_id, advertiser_id)
@@ -219,24 +238,10 @@ class CampaignUsecase:
                 start_date=campaign.start_date,
                 end_date=campaign.end_date,
                 advertiser_id=campaign.advertiser_id,
+                targeting=campaign.targeting,
             )
             for campaign in campaigns
         ]
-
-    async def _campaign_started(
-        self,
-        campaign_id: uuid.UUID,
-        advertiser_id: uuid.UUID,
-    ) -> bool:
-        campaign = await self.campaign_repository.get_campaign(
-            campaign_id,
-            advertiser_id,
-        )
-        current_day = int(
-            (await self.options_repository.get_option(AvailableOptions.DAY)).value,
-        )
-
-        return current_day >= campaign.start_date
 
 
 usecase_provider = dishka.Provider(scope=dishka.Scope.REQUEST)

@@ -34,3 +34,9 @@ class Campaign(pydantic.BaseModel):
     end_date: int
 
     targeting: Targeting | None = pydantic.Field(default=None)
+
+    async def started(self, current_day: int) -> bool:
+        return current_day >= self.start_date
+
+    async def ended(self, current_day: int) -> bool:
+        return current_day > self.end_date
