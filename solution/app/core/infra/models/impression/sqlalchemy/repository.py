@@ -3,9 +3,7 @@ import uuid
 import dishka
 import sqlalchemy.ext.asyncio
 
-from app.core.domain.feed.entities.entities import (
-    CampaignImpression as DomainImpression,
-)
+from app.core.domain.feed.entities.entities import CampaignImpression
 from app.core.domain.feed.entities.repositories import ImpressionsRepository
 from app.core.infra.models.impression.sqlalchemy.impression import Impression
 
@@ -19,7 +17,10 @@ class SQLAlchemyImpressionsRepository(ImpressionsRepository):
     ) -> None:
         self._session_factory = session_factory
 
-    async def create_impression(self, impression: DomainImpression) -> DomainImpression:
+    async def create_impression(
+        self,
+        impression: CampaignImpression,
+    ) -> CampaignImpression:
         async with self._session_factory() as session, session.begin():
             new_impression = Impression(
                 day=impression.day,
@@ -33,7 +34,7 @@ class SQLAlchemyImpressionsRepository(ImpressionsRepository):
             await session.flush()
             session.expunge_all()
 
-            return DomainImpression(
+            return CampaignImpression(
                 id=new_impression.id,
                 day=new_impression.day,
                 client_id=new_impression.client_id,
@@ -44,7 +45,7 @@ class SQLAlchemyImpressionsRepository(ImpressionsRepository):
         self,
         campaign_id: uuid.UUID,
         day: int | None = None,
-    ) -> list[DomainImpression]:
+    ) -> list[CampaignImpression]:
         async with self._session_factory() as session:
             query = sqlalchemy.select(Impression).where(
                 Impression.campaign_id == campaign_id,
@@ -57,7 +58,7 @@ class SQLAlchemyImpressionsRepository(ImpressionsRepository):
             impressions = result.scalars().all()
 
             return [
-                DomainImpression(
+                CampaignImpression(
                     id=impression.id,
                     day=impression.day,
                     client_id=impression.client_id,
