@@ -31,7 +31,7 @@ class CampaignNotFoundError(Exception):
 
 class CampaignInactiveError(Exception):
     def __init__(self) -> None:
-        super().__init__(r'Given campaign is ended \ not started.')
+        super().__init__(r'Given campaign is inactive (by any means).')
 
 
 class FeedUsecase:
@@ -177,6 +177,9 @@ class FeedUsecase:
         clicks = await self.clicks_repository.get_campaign_clicks(
             campaign_id, current_day
         )
+
+        if len(clicks) >= campaign.clicks_limit:
+            raise CampaignInactiveError
 
         if not any(click.client_id == client_id for click in clicks):
             click = CampaignClick(
