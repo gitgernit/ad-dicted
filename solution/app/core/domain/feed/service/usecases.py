@@ -29,6 +29,11 @@ class CampaignNotFoundError(Exception):
         super().__init__('No campaign found.')
 
 
+class CampaignInactiveError(Exception):
+    def __init__(self) -> None:
+        super().__init__(r'Given campaign is ended \ not started.')
+
+
 class FeedUsecase:
     def __init__(  # noqa
         self,
@@ -63,11 +68,11 @@ class FeedUsecase:
             location=client.location,
             gender=client.gender,
         )
-        active_campaigns = []
+        active_campaigns: list[Campaign, bool] = []  # campaign & viewed by client
 
         for campaign in targeted_campaigns:
             if not await campaign.started(current_day) or await campaign.ended(
-                current_day,
+                current_day
             ):
                 continue
 
@@ -78,14 +83,23 @@ class FeedUsecase:
             if len(impressions) >= campaign.impressions_limit:
                 continue
 
-            active_campaigns.append(campaign)
+            viewed = False
+
+            if any(impression.client_id == client_id for impression in impressions):
+                viewed = True
+
+            active_campaigns.append((campaign, viewed))
 
         if not active_campaigns:
             raise CampaignNotFoundError
 
-        campaign_score_pairs: list[tuple[Campaign, int]] = []
+        campaign_score_pairs: list[
+            tuple[Campaign, bool, int]
+        ] = []  # campaign, viewed, score
 
-        for campaign in active_campaigns:
+        for campaign_viewed_pair in active_campaigns:
+            campaign, viewed = campaign_viewed_pair
+
             ml_score = await self.score_repository.get_score(
                 client_id,
                 campaign.advertiser_id,
@@ -96,23 +110,28 @@ class FeedUsecase:
             campaign_score_pairs.append(
                 (
                     campaign,
+                    viewed,
                     score,
                 ),
             )
 
-        best_pair = max(
+        best_pairs = sorted(
             campaign_score_pairs,
-            key=lambda pair: pair[0].cost_per_impression * 0.6 + pair[1] * 0.4,
+            key=lambda pair: (
+                pair[1],
+                -(pair[0].cost_per_impression * 0.6 + pair[1] * 0.4),
+            ),
         )
-        best_campaign, best_score = best_pair
+        best_campaign, viewed, best_score = best_pairs[0]
 
-        new_impression = CampaignImpression(
-            day=current_day,
-            cost=best_campaign.cost_per_impression,
-            client_id=client_id,
-            campaign_id=best_campaign.id,
-        )
-        await self.impressions_repository.create_impression(new_impression)
+        if not viewed:
+            new_impression = CampaignImpression(
+                day=current_day,
+                cost=best_campaign.cost_per_impression,
+                client_id=client_id,
+                campaign_id=best_campaign.id,
+            )
+            await self.impressions_repository.create_impression(new_impression)
 
         return CampaignDTO(
             id=best_campaign.id,
@@ -151,13 +170,22 @@ class FeedUsecase:
         current_day = int(
             (await self.options_repository.get_option(AvailableOptions.DAY)).value,
         )
-        click = CampaignClick(
-            day=current_day,
-            cost=campaign.cost_per_click,
-            client_id=client_id,
-            campaign_id=campaign_id,
+
+        if not await campaign.started(current_day) or await campaign.ended(current_day):
+            raise CampaignInactiveError
+
+        clicks = await self.clicks_repository.get_campaign_clicks(
+            campaign_id, current_day
         )
-        await self.clicks_repository.create_click(click)
+
+        if not any(click.client_id == client_id for click in clicks):
+            click = CampaignClick(
+                day=current_day,
+                cost=campaign.cost_per_click,
+                client_id=client_id,
+                campaign_id=campaign_id,
+            )
+            await self.clicks_repository.create_click(click)
 
 
 usecase_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
