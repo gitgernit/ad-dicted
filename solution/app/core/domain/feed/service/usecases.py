@@ -72,7 +72,7 @@ class FeedUsecase:
 
         for campaign in targeted_campaigns:
             if not await campaign.started(current_day) or await campaign.ended(
-                current_day
+                current_day,
             ):
                 continue
 
@@ -175,7 +175,8 @@ class FeedUsecase:
             raise CampaignInactiveError
 
         clicks = await self.clicks_repository.get_campaign_clicks(
-            campaign_id, current_day
+            campaign_id,
+            current_day,
         )
 
         if len(clicks) >= campaign.clicks_limit:

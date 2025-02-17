@@ -50,6 +50,13 @@ class OptionsUsecase:
             value=domain_option.value,
         )
 
+    async def increment_option(self, option: AvailableOptionsDTO, delta: int) -> None:
+        domain_option_enum = AvailableOptions(option)
+        domain_option = await self.options_repository.get_option(domain_option_enum)
+
+        domain_option.value += delta
+        await self.options_repository.set_option(domain_option)
+
 
 usecase_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
 usecase_provider.provide(OptionsUsecase)

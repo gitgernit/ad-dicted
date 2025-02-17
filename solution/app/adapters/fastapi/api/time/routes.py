@@ -14,20 +14,24 @@ time_router = fastapi.APIRouter(route_class=DishkaRoute)
 @time_router.post('/advance')
 async def advance_day(
     usecase: FromDishka[OptionsUsecase],
-    advance_schema: AdvanceSchema,
+    advance_schema: AdvanceSchema | None = None,
 ) -> AdvanceSchema:
-    dto = OptionDTO(
-        option=AvailableOptionsDTO.DAY,
-        value=str(advance_schema.current_date),
-    )
+    if advance_schema:
+        dto = OptionDTO(
+            option=AvailableOptionsDTO.DAY,
+            value=str(advance_schema.current_date),
+        )
 
-    try:
-        await usecase.set_option(dto)
+        try:
+            await usecase.set_option(dto)
 
-    except InvalidDayError as error:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-            detail='Invalid date passed.',
-        ) from error
+        except InvalidDayError as error:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail='Invalid date passed.',
+            ) from error
+
+    else:
+        await usecase.increment_option(AvailableOptionsDTO.DAY, 1)
 
     return advance_schema
