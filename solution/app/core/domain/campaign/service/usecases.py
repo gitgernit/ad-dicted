@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 
 import dishka
@@ -8,6 +9,7 @@ from app.core.domain.campaign.entities.entities import Targeting
 from app.core.domain.campaign.entities.repositories import CampaignRepository
 from app.core.domain.campaign.service.dto import CampaignDTO
 from app.core.domain.campaign.service.dto import TargetingDTO
+from app.core.domain.campaign.service.moderators import Moderator
 from app.core.domain.options.entities.entities import AvailableOptions
 from app.core.domain.options.entities.repositories import OptionsRepository
 
@@ -33,10 +35,12 @@ class CampaignUsecase:
         campaign_repository: CampaignRepository,
         advertiser_repository: AdvertiserRepository,
         options_repository: OptionsRepository,
+        moderator: Moderator,
     ) -> None:
         self.campaign_repository = campaign_repository
         self.advertiser_repository = advertiser_repository
         self.options_repository = options_repository
+        self.moderator = moderator
 
     async def create_campaign(
         self,
@@ -70,6 +74,8 @@ class CampaignUsecase:
             campaign,
             overwrite=overwrite,
         )
+
+        asyncio.create_task(self.moderate_campaign(new_campaign.id))  # noqa
 
         return CampaignDTO(
             id=new_campaign.id,
@@ -183,6 +189,8 @@ class CampaignUsecase:
             overwrite=True,
         )
 
+        asyncio.create_task(self.moderate_campaign(new_campaign.id))  # noqa
+
         return CampaignDTO(
             id=new_campaign.id,
             impressions_limit=new_campaign.impressions_limit,
@@ -238,10 +246,29 @@ class CampaignUsecase:
                 start_date=campaign.start_date,
                 end_date=campaign.end_date,
                 advertiser_id=campaign.advertiser_id,
-                targeting=campaign.targeting,
+                targeting=TargetingDTO(
+                    gender=campaign.targeting.gender,
+                    age_from=campaign.targeting.age_from,
+                    age_to=campaign.targeting.age_to,
+                    location=campaign.targeting.location,
+                )
+                if campaign.targeting
+                else None,
             )
             for campaign in campaigns
         ]
+
+    async def moderate_campaign(self, campaign_id: uuid.UUID) -> None:
+        campaign = await self.campaign_repository.get_campaign(campaign_id)
+
+        if campaign is None:
+            raise CampaignNotFoundError
+
+        valid = await self.moderator.validate_text(campaign.ad_text)
+
+        if not valid:
+            campaign.ad_text = '[ MEGAZORDED ]'
+            await self.campaign_repository.create_campaign(campaign, overwrite=True)
 
 
 usecase_provider = dishka.Provider(scope=dishka.Scope.REQUEST)

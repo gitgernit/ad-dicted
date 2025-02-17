@@ -23,7 +23,7 @@ extend-select = [
 ignore = [
     "PERF101", "ISC001", "ARG001",
     "A005", "N805", "UP037",
-    "UP007", "F821"
+    "UP007", "F821", "RUF001"
 ]
 
 [lint.flake8-quotes]
