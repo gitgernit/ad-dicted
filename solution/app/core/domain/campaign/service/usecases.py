@@ -10,6 +10,7 @@ from app.core.domain.campaign.entities.repositories import CampaignRepository
 from app.core.domain.campaign.service.dto import CampaignDTO
 from app.core.domain.campaign.service.dto import TargetingDTO
 from app.core.domain.campaign.service.moderators import Moderator
+from app.core.domain.campaign.service.text_generators import TextGenerator
 from app.core.domain.options.entities.entities import AvailableOptions
 from app.core.domain.options.entities.repositories import OptionsRepository
 
@@ -36,11 +37,13 @@ class CampaignUsecase:
         advertiser_repository: AdvertiserRepository,
         options_repository: OptionsRepository,
         moderator: Moderator,
+        text_generator: TextGenerator,
     ) -> None:
         self.campaign_repository = campaign_repository
         self.advertiser_repository = advertiser_repository
         self.options_repository = options_repository
         self.moderator = moderator
+        self.text_generator = text_generator
 
     async def create_campaign(
         self,
@@ -269,6 +272,21 @@ class CampaignUsecase:
         if not valid:
             campaign.ad_text = '[ MEGAZORDED ]'
             await self.campaign_repository.create_campaign(campaign, overwrite=True)
+
+    async def pre_generate_campaign_description(
+        self,
+        advertiser_name: str,
+        campaign_name: str,
+    ) -> str:
+        prompt = """
+            Ты - генератор описаний для рекламных кампаний.
+            На вход тебе подается имя рекламодателя и имя рекламной кампании.
+            Генерируй подходящие описания рекламных кампаний.
+            Возвращай JSON-ответ формата {"result": {str}"}
+            """
+        text = f'Имя рекламодателя: {advertiser_name}, имя кампании: {campaign_name}'
+
+        return await self.text_generator.generate_text(prompt, text)
 
 
 usecase_provider = dishka.Provider(scope=dishka.Scope.REQUEST)

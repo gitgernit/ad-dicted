@@ -22,6 +22,7 @@ import app.core.infra.models.options.sqlalchemy.repository as options_repository
 import app.core.infra.models.score.sqlalchemy.repository as score_repository
 import app.core.infra.models.sqlalchemy.providers as sqlalchemy_providers
 import app.core.infra.moderation.yandexgpt as moderator_providers
+import app.core.infra.text_generators.yandexgpt as generator_providers
 import app.core.infra.yandexgpt.interactors as yandexgpt_providers
 
 container = dishka.make_async_container(
@@ -47,6 +48,7 @@ container = dishka.make_async_container(
         api_key=app.core.config.config.YANDEX_GPT_API_KEY,
     ),
     moderator_providers.moderator_provider,
+    generator_providers.generator_provider,
 )
 
 

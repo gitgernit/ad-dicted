@@ -244,3 +244,35 @@ async def put_campaign(
         campaign_id=new_campaign_dto.id,
         advertiser_id=new_campaign_dto.advertiser_id,
     )
+
+
+@campaigns_router.post('/moderate-text')
+async def moderate_text(
+    usecase: FromDishka[CampaignUsecase],
+    data: typing.Annotated[dict[typing.Literal['text'], str], fastapi.Body()],
+) -> dict[typing.Literal['valid', 'text'], str | bool]:
+    text = data['text']
+    valid = await usecase.moderator.validate_text(text)
+
+    return {
+        'valid': valid,
+        'text': text if valid else '[ MEGAZORDED ]',
+    }
+
+
+@campaigns_router.post('/generate-description')
+async def generate_campaign_description(
+    usecase: FromDishka[CampaignUsecase],
+    data: typing.Annotated[
+        dict[typing.Literal['advertiser_name', 'campaign_name'], str],
+        fastapi.Body(),
+    ],
+) -> dict[typing.Literal['result'], str]:
+    generated_description = await usecase.pre_generate_campaign_description(
+        data['advertiser_name'],
+        data['campaign_name'],
+    )
+
+    return {
+        'result': generated_description,
+    }
