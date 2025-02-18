@@ -26,6 +26,7 @@ class CampaignInputSchema(pydantic.BaseModel):
 
     ad_title: str
     ad_text: str
+    image_url: pydantic.AnyUrl | None = pydantic.Field(default=None)
 
     start_date: int
     end_date: int

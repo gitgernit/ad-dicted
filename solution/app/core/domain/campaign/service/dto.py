@@ -29,6 +29,7 @@ class CampaignDTO(pydantic.BaseModel):
 
     ad_title: str
     ad_text: str
+    image_url: str | None = pydantic.Field(default=None)
 
     start_date: int
     end_date: int

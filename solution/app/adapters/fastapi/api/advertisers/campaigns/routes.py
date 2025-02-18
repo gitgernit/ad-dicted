@@ -42,6 +42,7 @@ async def create_campaign(
         cost_per_click=campaign.cost_per_click,
         ad_title=campaign.ad_title,
         ad_text=campaign.ad_text,
+        image_url=campaign.image_url,
         start_date=campaign.start_date,
         end_date=campaign.end_date,
         targeting=targeting_dto,
@@ -74,6 +75,7 @@ async def create_campaign(
         cost_per_click=new_campaign.cost_per_click,
         ad_title=new_campaign.ad_title,
         ad_text=new_campaign.ad_text,
+        image_url=new_campaign.image_url,
         start_date=new_campaign.start_date,
         end_date=new_campaign.end_date,
         targeting=targeting_schema,
@@ -103,6 +105,7 @@ async def get_campaigns(
             cost_per_click=campaign_dto.cost_per_click,
             ad_title=campaign_dto.ad_title,
             ad_text=campaign_dto.ad_text,
+            image_url=campaign_dto.image_url,
             start_date=campaign_dto.start_date,
             end_date=campaign_dto.end_date,
             targeting=TargetingSchema(
@@ -152,6 +155,7 @@ async def get_campaign(
         cost_per_click=campaign_dto.cost_per_click,
         ad_title=campaign_dto.ad_title,
         ad_text=campaign_dto.ad_text,
+        image_url=campaign_dto.image_url,
         start_date=campaign_dto.start_date,
         end_date=campaign_dto.end_date,
         targeting=targeting_schema,
@@ -194,6 +198,7 @@ async def put_campaign(
         cost_per_click=campaign.cost_per_click,
         ad_title=campaign.ad_title,
         ad_text=campaign.ad_text,
+        image_url=campaign.image_url,
         start_date=campaign.start_date,
         end_date=campaign.end_date,
         targeting=TargetingDTO(
@@ -231,6 +236,7 @@ async def put_campaign(
         cost_per_click=new_campaign_dto.cost_per_click,
         ad_title=new_campaign_dto.ad_title,
         ad_text=new_campaign_dto.ad_text,
+        image_url=new_campaign_dto.image_url,
         start_date=new_campaign_dto.start_date,
         end_date=new_campaign_dto.end_date,
         targeting=TargetingSchema(
