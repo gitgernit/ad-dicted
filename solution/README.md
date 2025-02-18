@@ -23,6 +23,10 @@
   * [Architecture](#architecture)
     * [Layers](#layers)
     * [Service Dependencies](#service-dependencies)
+  * [Development](#development)
+    * [Project Management](#project-management)
+    * [Linting](#linting)
+    * [VCS](#vcs)
   * [Schemas](#schemas)
 
 ## Description
