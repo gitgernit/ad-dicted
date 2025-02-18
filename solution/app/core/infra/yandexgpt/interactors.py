@@ -13,6 +13,11 @@ class ResponseDecodingError(Exception):
         super().__init__('Couldnt decode Yandex GPT request.')
 
 
+class UnavailableError(Exception):
+    def __init__(self) -> None:
+        super().__init__('Couldnt retrieve answer from Yandex GPT.')
+
+
 class YandexGPTInteractor:
     def __init__(
         self,
@@ -47,7 +52,7 @@ class YandexGPTInteractor:
                     YANDEX_GPT_COMPLETION_URL,
                     headers=headers,
                     json=prompt_payload,
-                    timeout=3,
+                    timeout=10,
                 ) as response:
                     result = await response.json()
 
@@ -55,8 +60,11 @@ class YandexGPTInteractor:
                         '`',
                     )
 
-            except json.JSONDecodeError as error:
+            except (json.JSONDecodeError, KeyError) as error:
                 raise ResponseDecodingError from error
+
+            except TimeoutError as error:
+                raise UnavailableError from error
 
 
 class InteractorProvider(dishka.Provider):

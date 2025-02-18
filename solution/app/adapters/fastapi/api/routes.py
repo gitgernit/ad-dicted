@@ -12,11 +12,18 @@ from app.adapters.fastapi.api.schemas import ScoreSchema
 import app.adapters.fastapi.api.stats.routes
 import app.adapters.fastapi.api.storage.routes
 import app.adapters.fastapi.api.time.routes
-from app.core.domain.feed.service.usecases import CampaignNotFoundError
+from app.core.domain.feed.service.usecases import \
+    CampaignInactiveError as FeedCampaignInactiveError
+from app.core.domain.feed.service.usecases import \
+    CampaignNotFoundError as FeedCampaignNotFoundError
+from app.core.domain.feed.service.usecases import \
+    ClientNotFoundError as FeedClientNotFoundError
 from app.core.domain.feed.service.usecases import FeedUsecase
 from app.core.domain.score.service.dto import ScoreDTO
-from app.core.domain.score.service.usecases import AdvertiserNotFoundError
-from app.core.domain.score.service.usecases import ClientNotFoundError
+from app.core.domain.score.service.usecases import \
+    AdvertiserNotFoundError as ScoreAdvertiserNotFoundError
+from app.core.domain.score.service.usecases import \
+    ClientNotFoundError as ScoreClientNotFoundError
 from app.core.domain.score.service.usecases import ScoreUsecase
 
 api_router = fastapi.APIRouter(
@@ -45,6 +52,11 @@ api_router.include_router(
 )
 
 
+@api_router.get('/ping')
+async def pong() -> str:
+    return 'pong'
+
+
 @api_router.post('/ml-scores')
 async def create_score(
     usecase: FromDishka[ScoreUsecase],
@@ -59,13 +71,13 @@ async def create_score(
     try:
         await usecase.create_score(dto, overwrite=True)
 
-    except ClientNotFoundError as error:
+    except ScoreClientNotFoundError as error:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail='No such client.',
         ) from error
 
-    except AdvertiserNotFoundError as error:
+    except ScoreAdvertiserNotFoundError as error:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail='No such advertiser.',
@@ -80,13 +92,13 @@ async def get_campaign(
     try:
         best_campaign_dto = await usecase.get_best_campaign(client_id)
 
-    except ClientNotFoundError as error:
+    except FeedClientNotFoundError as error:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail='Client not found.',
         ) from error
 
-    except CampaignNotFoundError as error:
+    except FeedCampaignNotFoundError as error:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail='No campaign found.',
@@ -109,14 +121,20 @@ async def click_campaign(
     try:
         await usecase.click_campaign(client_id, campaign_id)
 
-    except ClientNotFoundError as error:
+    except FeedClientNotFoundError as error:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail='Client not found.',
         ) from error
 
-    except CampaignNotFoundError as error:
+    except FeedCampaignNotFoundError as error:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail='No campaign found.',
+        ) from error
+
+    except FeedCampaignInactiveError as error:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail='Campaign is inactive (by any means).',
         ) from error

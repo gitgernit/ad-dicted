@@ -14,6 +14,8 @@ from app.core.domain.campaign.service.usecases import AdvertiserNotFoundError
 from app.core.domain.campaign.service.usecases import CampaignNotFoundError
 from app.core.domain.campaign.service.usecases import CampaignUsecase
 from app.core.domain.campaign.service.usecases import InvalidCampaignError
+from app.core.infra.yandexgpt.interactors import ResponseDecodingError
+from app.core.infra.yandexgpt.interactors import UnavailableError
 
 campaigns_router = fastapi.APIRouter(route_class=DishkaRoute)
 
@@ -258,7 +260,18 @@ async def moderate_text(
     data: typing.Annotated[dict[typing.Literal['text'], str], fastapi.Body()],
 ) -> dict[typing.Literal['valid', 'text'], str | bool]:
     text = data['text']
-    valid = await usecase.moderator.validate_text(text)
+
+    if not text:
+        msg = 'Blank text passed'
+        raise fastapi.exceptions.RequestValidationError(msg)
+
+    try:
+        valid = await usecase.moderator.validate_text(text)
+
+    except (ResponseDecodingError, UnavailableError) as error:
+        raise fastapi.exceptions.HTTPException(
+            status_code=fastapi.status.HTTP_503_SERVICE_UNAVAILABLE,
+        ) from error
 
     return {
         'valid': valid,
@@ -274,10 +287,16 @@ async def generate_campaign_description(
         fastapi.Body(),
     ],
 ) -> dict[typing.Literal['result'], str]:
-    generated_description = await usecase.pre_generate_campaign_description(
-        data['advertiser_name'],
-        data['campaign_name'],
-    )
+    try:
+        generated_description = await usecase.pre_generate_campaign_description(
+            data['advertiser_name'],
+            data['campaign_name'],
+        )
+
+    except (ResponseDecodingError, UnavailableError) as error:
+        raise fastapi.exceptions.HTTPException(
+            status_code=fastapi.status.HTTP_503_SERVICE_UNAVAILABLE,
+        ) from error
 
     return {
         'result': generated_description,

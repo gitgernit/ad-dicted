@@ -44,4 +44,4 @@ COPY ./app /app/app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
-CMD ["sh", "-c", "sh scripts/prestart.sh && sh scripts/start.sh"]
+CMD ["sh", "-c", "sh scripts/prestart.sh && sh scripts/start-fastapi.sh"]

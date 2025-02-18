@@ -42,12 +42,12 @@ services:
       POSTGRES_HOST: postgres
       REDIS_HOST: redis
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://$SERVER_ADDRESS/api/ping"]
+      test: ["CMD", "curl", "-f", "http://$SERVER_ADDRESS/ping"]
       interval: 10s
       timeout: 5s
       retries: 5
     build:
-      context: .
+      dockerfile: ./Dockerfile-fastapi
 
 volumes:
   app-db-data:

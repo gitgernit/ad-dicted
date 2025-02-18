@@ -30,7 +30,9 @@ class Campaign(Base):
     ad_title: Mapped[str] = mapped_column(sa.String, nullable=False)
     ad_text: Mapped[str] = mapped_column(sa.Text, nullable=False)
     image_url: Mapped[str | None] = mapped_column(
-        sa.String, default=None, nullable=True
+        sa.String,
+        default=None,
+        nullable=True,
     )
 
     start_date: Mapped[int] = mapped_column(sa.Integer, nullable=False)

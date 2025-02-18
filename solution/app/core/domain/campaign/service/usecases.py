@@ -220,7 +220,7 @@ class CampaignUsecase:
         campaign_id: uuid.UUID,
         advertiser_id: uuid.UUID,
     ) -> None:
-        if self.campaign_repository.get_campaign(campaign_id) is None:
+        if await self.campaign_repository.get_campaign(campaign_id) is None:
             raise CampaignNotFoundError
 
         await self.campaign_repository.delete_campaign(campaign_id, advertiser_id)

@@ -68,7 +68,9 @@ class FeedUsecase:
             location=client.location,
             gender=client.gender,
         )
-        active_campaigns: list[Campaign, bool] = []  # campaign & viewed by client
+        active_campaigns: list[
+            tuple[Campaign, bool]
+        ] = []  # campaign & viewed by client
 
         for campaign in targeted_campaigns:
             if not await campaign.started(current_day) or await campaign.ended(

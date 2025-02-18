@@ -58,8 +58,8 @@ class S3StorageRepository(StorageRepository):
                 content = await response['Body'].read()
                 content_type = response.get('ContentType', 'application/octet-stream')
 
-            except botocore.errorfactory.ClientError:
-                raise FileRetrievalError
+            except botocore.errorfactory.ClientError as error:
+                raise FileRetrievalError from error
 
             return content, content_type
 
