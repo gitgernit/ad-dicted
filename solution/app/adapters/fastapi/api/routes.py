@@ -10,6 +10,7 @@ import app.adapters.fastapi.api.clients.routes
 from app.adapters.fastapi.api.schemas import CampaignOutputSchema
 from app.adapters.fastapi.api.schemas import ScoreSchema
 import app.adapters.fastapi.api.stats.routes
+import app.adapters.fastapi.api.storage.routes
 import app.adapters.fastapi.api.time.routes
 from app.core.domain.feed.service.usecases import CampaignNotFoundError
 from app.core.domain.feed.service.usecases import FeedUsecase
@@ -37,6 +38,10 @@ api_router.include_router(
 api_router.include_router(
     app.adapters.fastapi.api.stats.routes.stats_router,
     prefix='/stats',
+)
+api_router.include_router(
+    app.adapters.fastapi.api.storage.routes.storage_router,
+    prefix='/storage',
 )
 
 

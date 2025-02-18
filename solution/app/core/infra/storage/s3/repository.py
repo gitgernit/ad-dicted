@@ -2,9 +2,11 @@ import mimetypes
 import uuid
 
 import aioboto3
+import botocore.errorfactory
 import dishka
 
-from app.core.domain.repositories import StorageRepository
+from app.core.domain.storage.service.repositories import FileRetrievalError
+from app.core.domain.storage.service.repositories import StorageRepository
 
 
 class S3StorageRepository(StorageRepository):
@@ -51,11 +53,15 @@ class S3StorageRepository(StorageRepository):
             aws_access_key_id=self.access_key_id,
             aws_secret_access_key=self.access_key,
         ) as s3:
-            response = await s3.get_object(Bucket=self.bucket, Key=file_id)
-            content = await response['Body'].read()
-            content_type = response.get('ContentType', 'application/octet-stream')
+            try:
+                response = await s3.get_object(Bucket=self.bucket, Key=file_id)
+                content = await response['Body'].read()
+                content_type = response.get('ContentType', 'application/octet-stream')
 
-        return content, content_type
+            except botocore.errorfactory.ClientError:
+                raise FileRetrievalError
+
+            return content, content_type
 
 
 def get_mime_type(filename: str) -> str:

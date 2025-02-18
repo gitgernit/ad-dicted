@@ -13,6 +13,7 @@ import app.core.domain.options.service.dto
 import app.core.domain.options.service.usecases
 import app.core.domain.score.service.usecases
 import app.core.domain.stats.service.usecases
+import app.core.domain.storage.service.usecases
 import app.core.infra.models.advertiser.sqlalchemy.repository as advertiser_repository
 import app.core.infra.models.campaign.sqlalchemy.repository as campaign_repository
 import app.core.infra.models.click.sqlalchemy.repository as clicks_repository
@@ -42,6 +43,7 @@ container = dishka.make_async_container(
     app.core.domain.options.service.usecases.usecase_provider,
     app.core.domain.feed.service.usecases.usecase_provider,
     app.core.domain.stats.service.usecases.usecase_provider,
+    app.core.domain.storage.service.usecases.usecase_provider,
     sqlalchemy_providers.EngineProvider(app.core.config.psycopg_url),
     sqlalchemy_providers.SessionProvider(),
     yandexgpt_providers.InteractorProvider(

@@ -175,6 +175,7 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic-settings" },
+    { name = "python-multipart" },
 ]
 
 [package.dev-dependencies]
@@ -192,6 +193,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.6" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2.4" },
     { name = "pydantic-settings", specifier = ">=2.7.1" },
+    { name = "python-multipart", specifier = ">=0.0.20" },
 ]
 
 [package.metadata.requires-dev]
