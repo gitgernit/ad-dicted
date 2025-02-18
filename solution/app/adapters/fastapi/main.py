@@ -1,4 +1,6 @@
 import contextlib
+import sys
+import asyncio
 
 import dishka.integrations.fastapi
 import fastapi
@@ -26,6 +28,9 @@ import app.core.infra.moderation.yandexgpt as moderator_providers
 import app.core.infra.storage.s3.repository as storage_providers
 import app.core.infra.text_generators.yandexgpt as generator_providers
 import app.core.infra.yandexgpt.interactors as yandexgpt_providers
+
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 container = dishka.make_async_container(
     dishka.integrations.fastapi.FastapiProvider(),
