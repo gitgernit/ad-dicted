@@ -18,6 +18,10 @@ class Config(pydantic_settings.BaseSettings):
     YANDEX_GPT_CATALOG_IDENTIFIER: str = pydantic.Field(default='')
     YANDEX_GPT_API_KEY: str = pydantic.Field(default='')
 
+    S3_KEY_IDENTIFIER: str = pydantic.Field(default='')
+    S3_KEY: str = pydantic.Field(default='')
+    S3_BUCKET: str = pydantic.Field(default='')
+
     DEBUG: bool = pydantic.Field(default=False)
 
 
