@@ -1,8 +1,7 @@
 import enum
 
 import sqlalchemy as sa
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.infra.models.sqlalchemy import Base
 

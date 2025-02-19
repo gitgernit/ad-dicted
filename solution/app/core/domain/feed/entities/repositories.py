@@ -1,8 +1,7 @@
 import abc
 import uuid
 
-from app.core.domain.feed.entities.entities import CampaignClick
-from app.core.domain.feed.entities.entities import CampaignImpression
+from app.core.domain.feed.entities.entities import CampaignClick, CampaignImpression
 
 
 class ImpressionsRepository(abc.ABC):

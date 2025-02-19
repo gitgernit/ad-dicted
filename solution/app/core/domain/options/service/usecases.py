@@ -1,10 +1,8 @@
 import dishka
 
-from app.core.domain.options.entities.entities import AvailableOptions
-from app.core.domain.options.entities.entities import Option
+from app.core.domain.options.entities.entities import AvailableOptions, Option
 from app.core.domain.options.entities.repositories import OptionsRepository
-from app.core.domain.options.service.dto import AvailableOptionsDTO
-from app.core.domain.options.service.dto import OptionDTO
+from app.core.domain.options.service.dto import AvailableOptionsDTO, OptionDTO
 
 
 class InvalidDayError(Exception):

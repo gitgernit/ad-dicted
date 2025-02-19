@@ -3,8 +3,7 @@ import sqlalchemy.ext.asyncio
 
 from app.core.domain.options.entities.entities import Option as DomainOption
 from app.core.domain.options.entities.repositories import OptionsRepository
-from app.core.infra.models.options.sqlalchemy.options import AvailableOptions
-from app.core.infra.models.options.sqlalchemy.options import Options
+from app.core.infra.models.options.sqlalchemy.options import AvailableOptions, Options
 
 
 class SQLAlchemyOptionsRepository(OptionsRepository):

@@ -3,8 +3,10 @@ import json
 import dishka
 
 from app.core.domain.campaign.service.text_generators import TextGenerator
-from app.core.infra.yandexgpt.interactors import ResponseDecodingError
-from app.core.infra.yandexgpt.interactors import YandexGPTInteractor
+from app.core.infra.yandexgpt.interactors import (
+    ResponseDecodingError,
+    YandexGPTInteractor,
+)
 
 
 class YandexGPTTextGenerator(TextGenerator):

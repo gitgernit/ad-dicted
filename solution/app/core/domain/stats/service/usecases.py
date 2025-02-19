@@ -4,8 +4,10 @@ import uuid
 import dishka
 
 from app.core.domain.campaign.entities.repositories import CampaignRepository
-from app.core.domain.feed.entities.repositories import ClicksRepository
-from app.core.domain.feed.entities.repositories import ImpressionsRepository
+from app.core.domain.feed.entities.repositories import (
+    ClicksRepository,
+    ImpressionsRepository,
+)
 from app.core.domain.options.entities.entities import AvailableOptions
 from app.core.domain.options.entities.repositories import OptionsRepository
 from app.core.domain.stats.service.dto import CampaignStatsDTO

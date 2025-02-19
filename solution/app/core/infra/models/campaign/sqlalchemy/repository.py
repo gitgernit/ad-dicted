@@ -7,8 +7,7 @@ from app.core.domain.campaign.entities.entities import Campaign as DomainCampaig
 from app.core.domain.campaign.entities.entities import Targeting as DomainTargeting
 from app.core.domain.campaign.entities.repositories import CampaignRepository
 from app.core.domain.client.entities.entities import Gender as DomainGender
-from app.core.infra.models.campaign.sqlalchemy.campaign import Campaign
-from app.core.infra.models.campaign.sqlalchemy.campaign import CampaignGender
+from app.core.infra.models.campaign.sqlalchemy.campaign import Campaign, CampaignGender
 
 
 class SQLAlchemyCampaignRepository(CampaignRepository):

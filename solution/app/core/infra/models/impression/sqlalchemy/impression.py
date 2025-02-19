@@ -1,9 +1,7 @@
 import uuid
 
 import sqlalchemy as sa
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.infra.models.sqlalchemy import Base
 

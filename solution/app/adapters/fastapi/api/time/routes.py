@@ -1,12 +1,9 @@
-from dishka.integrations.fastapi import DishkaRoute
-from dishka.integrations.fastapi import FromDishka
 import fastapi
+from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from app.adapters.fastapi.api.time.schemas import AdvanceSchema
-from app.core.domain.options.service.dto import AvailableOptionsDTO
-from app.core.domain.options.service.dto import OptionDTO
-from app.core.domain.options.service.usecases import InvalidDayError
-from app.core.domain.options.service.usecases import OptionsUsecase
+from app.core.domain.options.service.dto import AvailableOptionsDTO, OptionDTO
+from app.core.domain.options.service.usecases import InvalidDayError, OptionsUsecase
 
 time_router = fastapi.APIRouter(route_class=DishkaRoute)
 

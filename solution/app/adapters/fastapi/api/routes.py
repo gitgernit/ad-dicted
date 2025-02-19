@@ -1,30 +1,37 @@
 import typing
 import uuid
 
-from dishka.integrations.fastapi import DishkaRoute
-from dishka.integrations.fastapi import FromDishka
 import fastapi
+from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 import app.adapters.fastapi.api.advertisers.routes
 import app.adapters.fastapi.api.clients.routes
-from app.adapters.fastapi.api.schemas import CampaignOutputSchema
-from app.adapters.fastapi.api.schemas import ScoreSchema
 import app.adapters.fastapi.api.stats.routes
 import app.adapters.fastapi.api.storage.routes
 import app.adapters.fastapi.api.time.routes
-from app.core.domain.feed.service.usecases import \
-    CampaignInactiveError as FeedCampaignInactiveError
-from app.core.domain.feed.service.usecases import \
-    CampaignNotFoundError as FeedCampaignNotFoundError
-from app.core.domain.feed.service.usecases import \
-    ClientNotFoundError as FeedClientNotFoundError
-from app.core.domain.feed.service.usecases import FeedUsecase
+from app.adapters.fastapi.api.schemas import CampaignOutputSchema, ScoreSchema
+from app.core.domain.feed.service.usecases import (
+    CampaignInactiveError as FeedCampaignInactiveError,
+)
+from app.core.domain.feed.service.usecases import (
+    CampaignNotFoundError as FeedCampaignNotFoundError,
+)
+from app.core.domain.feed.service.usecases import (
+    ClientNotFoundError as FeedClientNotFoundError,
+)
+from app.core.domain.feed.service.usecases import (
+    FeedUsecase,
+)
 from app.core.domain.score.service.dto import ScoreDTO
-from app.core.domain.score.service.usecases import \
-    AdvertiserNotFoundError as ScoreAdvertiserNotFoundError
-from app.core.domain.score.service.usecases import \
-    ClientNotFoundError as ScoreClientNotFoundError
-from app.core.domain.score.service.usecases import ScoreUsecase
+from app.core.domain.score.service.usecases import (
+    AdvertiserNotFoundError as ScoreAdvertiserNotFoundError,
+)
+from app.core.domain.score.service.usecases import (
+    ClientNotFoundError as ScoreClientNotFoundError,
+)
+from app.core.domain.score.service.usecases import (
+    ScoreUsecase,
+)
 
 api_router = fastapi.APIRouter(
     route_class=DishkaRoute,

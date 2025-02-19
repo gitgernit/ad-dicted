@@ -1,5 +1,5 @@
-from dishka.integrations.fastapi import DishkaRoute
 import fastapi
+from dishka.integrations.fastapi import DishkaRoute
 
 import app.adapters.fastapi.api.stats.advertisers.routes
 import app.adapters.fastapi.api.stats.campaigns.routes

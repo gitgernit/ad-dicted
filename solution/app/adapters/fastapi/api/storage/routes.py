@@ -1,8 +1,7 @@
 import typing
 
-from dishka.integrations.fastapi import DishkaRoute
-from dishka.integrations.fastapi import FromDishka
 import fastapi
+from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from app.core.domain.storage.service.repositories import FileRetrievalError
 from app.core.domain.storage.service.usecases import StorageUsecase

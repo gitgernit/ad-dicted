@@ -1,6 +1,6 @@
+import asyncio
 import contextlib
 import sys
-import asyncio
 
 import dishka.integrations.fastapi
 import fastapi

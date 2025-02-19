@@ -1,7 +1,6 @@
 import abc
 
-from app.core.domain.options.entities.entities import AvailableOptions
-from app.core.domain.options.entities.entities import Option
+from app.core.domain.options.entities.entities import AvailableOptions, Option
 
 
 class OptionsRepository(abc.ABC):

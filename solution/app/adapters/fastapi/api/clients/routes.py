@@ -1,9 +1,8 @@
 import typing
 import uuid
 
-from dishka.integrations.fastapi import DishkaRoute
-from dishka.integrations.fastapi import FromDishka
 import fastapi
+from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from app.adapters.fastapi.api.clients.schemas import ClientSchema
 from app.core.domain.client.service.dto import ClientDTO

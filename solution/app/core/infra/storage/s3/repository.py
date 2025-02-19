@@ -5,8 +5,10 @@ import aioboto3
 import botocore.errorfactory
 import dishka
 
-from app.core.domain.storage.service.repositories import FileRetrievalError
-from app.core.domain.storage.service.repositories import StorageRepository
+from app.core.domain.storage.service.repositories import (
+    FileRetrievalError,
+    StorageRepository,
+)
 
 
 class S3StorageRepository(StorageRepository):

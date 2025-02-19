@@ -4,11 +4,9 @@ import uuid
 import dishka
 
 from app.core.domain.advertiser.entities.repositories import AdvertiserRepository
-from app.core.domain.campaign.entities.entities import Campaign
-from app.core.domain.campaign.entities.entities import Targeting
+from app.core.domain.campaign.entities.entities import Campaign, Targeting
 from app.core.domain.campaign.entities.repositories import CampaignRepository
-from app.core.domain.campaign.service.dto import CampaignDTO
-from app.core.domain.campaign.service.dto import TargetingDTO
+from app.core.domain.campaign.service.dto import CampaignDTO, TargetingDTO
 from app.core.domain.campaign.service.moderators import Moderator
 from app.core.domain.campaign.service.text_generators import TextGenerator
 from app.core.domain.options.entities.entities import AvailableOptions

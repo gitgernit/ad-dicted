@@ -1,21 +1,22 @@
 import typing
 import uuid
 
-from dishka.integrations.fastapi import DishkaRoute
-from dishka.integrations.fastapi import FromDishka
 import fastapi
+from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
-from app.adapters.fastapi.api.advertisers.campaigns.schemas import CampaignInputSchema
-from app.adapters.fastapi.api.advertisers.campaigns.schemas import CampaignOutputSchema
-from app.adapters.fastapi.api.advertisers.campaigns.schemas import TargetingSchema
-from app.core.domain.campaign.service.dto import CampaignDTO
-from app.core.domain.campaign.service.dto import TargetingDTO
-from app.core.domain.campaign.service.usecases import AdvertiserNotFoundError
-from app.core.domain.campaign.service.usecases import CampaignNotFoundError
-from app.core.domain.campaign.service.usecases import CampaignUsecase
-from app.core.domain.campaign.service.usecases import InvalidCampaignError
-from app.core.infra.yandexgpt.interactors import ResponseDecodingError
-from app.core.infra.yandexgpt.interactors import UnavailableError
+from app.adapters.fastapi.api.advertisers.campaigns.schemas import (
+    CampaignInputSchema,
+    CampaignOutputSchema,
+    TargetingSchema,
+)
+from app.core.domain.campaign.service.dto import CampaignDTO, TargetingDTO
+from app.core.domain.campaign.service.usecases import (
+    AdvertiserNotFoundError,
+    CampaignNotFoundError,
+    CampaignUsecase,
+    InvalidCampaignError,
+)
+from app.core.infra.yandexgpt.interactors import ResponseDecodingError, UnavailableError
 
 campaigns_router = fastapi.APIRouter(route_class=DishkaRoute)
 

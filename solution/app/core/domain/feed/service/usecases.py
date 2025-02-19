@@ -1,16 +1,16 @@
-from typing import TYPE_CHECKING
 import uuid
+from typing import TYPE_CHECKING
 
 import dishka
 
 from app.core.domain.campaign.entities.repositories import CampaignRepository
-from app.core.domain.campaign.service.dto import CampaignDTO
-from app.core.domain.campaign.service.dto import TargetingDTO
+from app.core.domain.campaign.service.dto import CampaignDTO, TargetingDTO
 from app.core.domain.client.entities.repositories import ClientRepository
-from app.core.domain.feed.entities.entities import CampaignClick
-from app.core.domain.feed.entities.entities import CampaignImpression
-from app.core.domain.feed.entities.repositories import ClicksRepository
-from app.core.domain.feed.entities.repositories import ImpressionsRepository
+from app.core.domain.feed.entities.entities import CampaignClick, CampaignImpression
+from app.core.domain.feed.entities.repositories import (
+    ClicksRepository,
+    ImpressionsRepository,
+)
 from app.core.domain.options.entities.entities import AvailableOptions
 from app.core.domain.options.entities.repositories import OptionsRepository
 from app.core.domain.score.entities.repositories import ScoreRepository

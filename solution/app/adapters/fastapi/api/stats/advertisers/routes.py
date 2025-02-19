@@ -1,9 +1,8 @@
 import typing
 import uuid
 
-from dishka.integrations.fastapi import DishkaRoute
-from dishka.integrations.fastapi import FromDishka
 import fastapi
+from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 from app.adapters.fastapi.api.stats.schemas import CampaignStatsSchema
 from app.core.domain.stats.service.usecases import StatsUsecase

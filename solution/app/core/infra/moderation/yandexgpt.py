@@ -3,8 +3,10 @@ import json
 import dishka
 
 from app.core.domain.campaign.service.moderators import Moderator
-from app.core.infra.yandexgpt.interactors import ResponseDecodingError
-from app.core.infra.yandexgpt.interactors import YandexGPTInteractor
+from app.core.infra.yandexgpt.interactors import (
+    ResponseDecodingError,
+    YandexGPTInteractor,
+)
 
 PROMPT = """
     Ты - модератор описаний рекламных кампаний. Тебе подается текст рекламной кампании.

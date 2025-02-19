@@ -1,9 +1,8 @@
 import typing
 import uuid
 
-from dishka.integrations.fastapi import DishkaRoute
-from dishka.integrations.fastapi import FromDishka
 import fastapi
+from dishka.integrations.fastapi import DishkaRoute, FromDishka
 
 import app.adapters.fastapi.api.advertisers.campaigns.routes
 from app.adapters.fastapi.api.advertisers.schemas import AdvertiserSchema
