@@ -4,6 +4,7 @@ import dishka
 import sqlalchemy.ext.asyncio
 
 from app.core.domain.client.entities.entities import Client as DomainClient
+from app.core.domain.client.entities.entities import Gender as DomainGender
 from app.core.domain.client.entities.repositories import ClientRepository
 from app.core.infra.models.client.sqlalchemy.client import Client
 
@@ -24,6 +25,15 @@ class SQLAlchemyClientRepository(ClientRepository):
         overwrite: bool = False,
     ) -> DomainClient:
         async with self._session_factory() as session, session.begin():
+            stmt = sqlalchemy.select(Client).where(Client.login == client.login)
+
+            existing_client = await session.execute(stmt)
+            existing_client = existing_client.scalar_one_or_none()
+
+            if existing_client:
+                await session.delete(existing_client)
+                await session.flush()
+
             new_client = Client(
                 id=client.id,
                 login=client.login,
@@ -45,7 +55,7 @@ class SQLAlchemyClientRepository(ClientRepository):
                 login=new_client.login,
                 age=new_client.age,
                 location=new_client.location,
-                gender=new_client.gender,
+                gender=DomainGender(new_client.gender),
             )
 
     async def get_client(self, client_id: uuid.UUID) -> DomainClient | None:
