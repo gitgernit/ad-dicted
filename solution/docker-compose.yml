@@ -1,4 +1,4 @@
-name: advertisement
+name: ad-dicted
 
 services:
   postgres:
