@@ -42,12 +42,33 @@ services:
       POSTGRES_HOST: postgres
       REDIS_HOST: redis
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://$SERVER_ADDRESS/ping"]
+      test: ["CMD", "curl", "-f", "http://backend/ping"]
       interval: 10s
       timeout: 5s
       retries: 5
     build:
       dockerfile: ./Dockerfile-fastapi
 
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    ports:
+      - "$GRAFANA_PORT:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    env_file:
+      - path: .env.template
+        required: true
+      - path: .env
+        required: false
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_PATHS_DASHBOARDS=/var/lib/grafana/dashboards
+    depends_on:
+      - postgres
+
 volumes:
   app-db-data:
+  grafana-data:

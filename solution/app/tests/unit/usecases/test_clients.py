@@ -1,17 +1,18 @@
 import uuid
 
 import pytest
-from app.core.domain.client.service.usecases import ClientUsecase
+
 from app.core.domain.client.service.dto import ClientDTO, Gender
+from app.core.domain.client.service.usecases import ClientUsecase
 
 
 @pytest.mark.asyncio
 class TestClientsUsecase:
-    @pytest.fixture(scope='function', autouse=True)
-    def setup(self, client_usecase: ClientUsecase):
+    @pytest.fixture(autouse=True)
+    def setup(self, client_usecase: ClientUsecase) -> None:
         self.usecase = client_usecase
 
-    async def test_create_client(self):
+    async def test_create_client(self) -> None:
         client_dto = ClientDTO(
             id=uuid.uuid4(),
             login='john_doe',

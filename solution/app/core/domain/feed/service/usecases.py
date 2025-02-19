@@ -35,7 +35,7 @@ class CampaignInactiveError(Exception):
 
 
 class FeedUsecase:
-    def __init__(  # noqa
+    def __init__(
         self,
         campaign_repository: CampaignRepository,
         client_repository: ClientRepository,

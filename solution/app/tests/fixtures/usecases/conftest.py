@@ -1,10 +1,5 @@
 import pytest
 
-# Initialize fixtures
-from app.tests.fixtures.repositories.conftest import *  # noqa
-from app.tests.fixtures.storages import *  # noqa
-from app.tests.fixtures.yandexgpt.conftest import *  # noqa
-
 from app.core.domain.advertiser.service.usecases import AdvertiserUsecase
 from app.core.domain.campaign.service.usecases import CampaignUsecase
 from app.core.domain.client.service.usecases import ClientUsecase
@@ -23,6 +18,11 @@ from app.core.infra.models.options.memory.repository import OptionsRepository
 from app.core.infra.models.score.memory.repository import ScoreRepository
 from app.core.infra.moderation.yandexgpt import YandexGPTModerator
 from app.core.infra.text_generators.yandexgpt import YandexGPTTextGenerator
+
+# Initialize fixtures
+from app.tests.fixtures.repositories.conftest import *  # noqa
+from app.tests.fixtures.storages import *  # noqa
+from app.tests.fixtures.yandexgpt.conftest import *  # noqa
 
 
 @pytest.fixture

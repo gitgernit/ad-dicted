@@ -74,7 +74,6 @@ class MemoryCampaignRepository(CampaignRepository):
             and (c.targeting.age_to is None or c.targeting.age_to >= age)
             and (c.targeting.location is None or c.targeting.location == location)
             and (
-                c.targeting.gender is None
-                or c.targeting.gender in (gender, Gender.ALL)
+                c.targeting.gender is None or c.targeting.gender in (gender, Gender.ALL)
             )
         ]

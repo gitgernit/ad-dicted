@@ -35,3 +35,13 @@ ban-relative-imports = 'all'
 
 [lint.mccabe]
 max-complexity = 8
+
+[lint.extend-per-file-ignores]
+"**/tests/**/*.py" = [
+    "S101", # asserts allowed in tests...
+    "ARG", # Unused function args -> fixtures nevertheless are functionally relevant...
+    "FBT", # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
+    # The below are debateable
+    "PLR2004", # Magic value used in comparison, ...
+    "S311", # Standard pseudo-random generators are not suitable for cryptographic purposes
+]
