@@ -18,10 +18,15 @@ import app.core.infra.models.impression.sqlalchemy.repository as impressions_rep
 import app.core.infra.models.options.sqlalchemy.repository as options_repository
 import app.core.infra.models.score.sqlalchemy.repository as score_repository
 import app.core.infra.models.sqlalchemy.providers as sqlalchemy_providers
-import app.core.infra.moderation.yandexgpt as moderator_providers
 import app.core.infra.storage.s3.repository as storage_providers
 import app.core.infra.text_generators.yandexgpt as generator_providers
 import app.core.infra.yandexgpt.interactors as yandexgpt_providers
+
+if app.core.config.config.MODERATE_TEXTS:
+    import app.core.infra.moderation.yandexgpt as moderator_providers
+
+else:
+    import app.core.infra.moderation.mock as moderator_providers
 
 container = dishka.make_async_container(
     dishka.integrations.fastapi.FastapiProvider(),

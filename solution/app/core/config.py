@@ -9,6 +9,8 @@ class Config(pydantic_settings.BaseSettings):
         extra='ignore',
     )
 
+    MODERATE_TEXTS: bool = pydantic.Field(default=False)
+
     POSTGRES_USERNAME: str = pydantic.Field(default='postgres')
     POSTGRES_PASSWORD: str = pydantic.Field(default='postgres')
     POSTGRES_HOST: str = pydantic.Field(default='localhost')
