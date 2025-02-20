@@ -12,11 +12,11 @@ services:
       timeout: 10s
     volumes:
       - app-db-data:/var/lib/postgresql/data/pgdata
-    env_file:
-      - path: .env.template
-        required: true
-      - path: .env
-        required: false
+    env_file: ".env"
+#      - path: .env.template
+#        required: true
+#      - path: .env
+#        required: false
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
       PGPORT: $POSTGRES_PORT
@@ -33,11 +33,11 @@ services:
       postgres:
         condition: service_healthy
         restart: true
-    env_file:
-      - path: .env.template
-        required: true
-      - path: .env
-        required: false
+    env_file: ".env"
+#      - path: .env.template
+#        required: true
+#      - path: .env
+#        required: false
     environment:
       POSTGRES_HOST: postgres
       REDIS_HOST: redis
@@ -58,11 +58,11 @@ services:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
       - ./grafana/dashboards:/var/lib/grafana/dashboards
-    env_file:
-      - path: .env.template
-        required: true
-      - path: .env
-        required: false
+    env_file: ".env"
+#      - path: .env.template
+#        required: true
+#      - path: .env
+#        required: false
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_PATHS_DASHBOARDS=/var/lib/grafana/dashboards
