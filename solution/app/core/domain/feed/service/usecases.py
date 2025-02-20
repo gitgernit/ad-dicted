@@ -81,8 +81,12 @@ class FeedUsecase:
             impressions = await self.impressions_repository.get_campaign_impressions(
                 campaign.id,
             )
+            clicks = await self.clicks_repository.get_campaign_clicks(campaign.id)
 
             if len(impressions) >= campaign.impressions_limit:
+                continue
+
+            if len(clicks) >= campaign.clicks_limit:
                 continue
 
             viewed = False
@@ -117,11 +121,17 @@ class FeedUsecase:
                 ),
             )
 
+        best_score = max(campaign_score_pairs, key=lambda pair: pair[2])
+        best_price = max(
+            campaign_score_pairs,
+            key=lambda pair: pair[0].cost_per_impression,
+        )
+
         best_pairs = sorted(
             campaign_score_pairs,
             key=lambda pair: (
                 pair[1],
-                -(pair[0].cost_per_impression * 0.6 + pair[1] * 0.4),
+                -(pair[0].cost_per_impression / best_price * 2 + pair[1] / best_score),
             ),
         )
         best_campaign, viewed, best_score = best_pairs[0]
