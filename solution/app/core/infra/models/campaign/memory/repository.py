@@ -1,5 +1,7 @@
 import uuid
 
+import dishka
+
 from app.core.domain.campaign.entities.entities import Campaign, Gender
 from app.core.domain.campaign.entities.repositories import CampaignRepository
 from app.core.infra.models.memory import MemoryStorage
@@ -77,3 +79,7 @@ class MemoryCampaignRepository(CampaignRepository):
                 c.targeting.gender is None or c.targeting.gender in (gender, Gender.ALL)
             )
         ]
+
+
+repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
+repository_provider.provide(MemoryCampaignRepository)

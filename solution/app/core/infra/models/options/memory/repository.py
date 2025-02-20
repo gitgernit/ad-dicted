@@ -1,3 +1,5 @@
+import dishka
+
 from app.core.domain.options.entities.entities import AvailableOptions, Option
 from app.core.domain.options.entities.repositories import OptionsRepository
 from app.core.infra.models.memory import MemoryStorage
@@ -28,3 +30,7 @@ class MemoryOptionsRepository(OptionsRepository):
 
         else:
             self._storage.options.append(option)
+
+
+repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
+repository_provider.provide(MemoryOptionsRepository)

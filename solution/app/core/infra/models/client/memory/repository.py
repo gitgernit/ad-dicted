@@ -1,5 +1,7 @@
 import uuid
 
+import dishka
+
 from app.core.domain.client.entities.entities import Client
 from app.core.domain.client.entities.repositories import ClientRepository
 from app.core.infra.models.memory import MemoryStorage
@@ -30,3 +32,7 @@ class MemoryClientRepository(ClientRepository):
             (c for c in self._storage.clients if c.id == client_id),
             None,
         )
+
+
+repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
+repository_provider.provide(MemoryClientRepository)

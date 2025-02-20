@@ -1,5 +1,5 @@
 __all__ = ['MemoryStorage']
-
+import dishka
 import pydantic
 
 from app.core.domain.advertiser.entities.entities import Advertiser
@@ -20,4 +20,5 @@ class MemoryStorage(pydantic.BaseModel):
     scores: list[Score] = pydantic.Field(default=[])
 
 
-memory_storage = MemoryStorage()
+storage_provider = dishka.Provider(scope=dishka.Scope.APP)
+storage_provider.provide(MemoryStorage)

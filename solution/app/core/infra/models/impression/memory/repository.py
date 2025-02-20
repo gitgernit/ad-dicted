@@ -1,5 +1,7 @@
 import uuid
 
+import dishka
+
 from app.core.domain.feed.entities.entities import CampaignImpression
 from app.core.domain.feed.entities.repositories import ImpressionsRepository
 from app.core.infra.models.memory import MemoryStorage
@@ -28,3 +30,7 @@ class MemoryImpressionsRepository(ImpressionsRepository):
             for imp in self._storage.impressions
             if imp.campaign_id == campaign_id and (day is None or imp.day == day)
         ]
+
+
+repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
+repository_provider.provide(MemoryImpressionsRepository)

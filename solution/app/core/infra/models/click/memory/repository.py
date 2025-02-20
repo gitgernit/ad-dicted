@@ -1,5 +1,7 @@
 import uuid
 
+import dishka
+
 from app.core.domain.feed.entities.entities import CampaignClick
 from app.core.domain.feed.entities.repositories import ClicksRepository
 from app.core.infra.models.memory import MemoryStorage
@@ -25,3 +27,7 @@ class MemoryClicksRepository(ClicksRepository):
             for clk in self._storage.clicks
             if clk.campaign_id == campaign_id and (day is None or clk.day == day)
         ]
+
+
+repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
+repository_provider.provide(MemoryClicksRepository)

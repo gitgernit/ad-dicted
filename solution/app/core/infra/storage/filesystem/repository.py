@@ -2,6 +2,7 @@ import pathlib
 import uuid
 
 import aiofiles
+import dishka
 
 from app.core.infra.storage.s3.repository import StorageRepository
 
@@ -36,3 +37,18 @@ class FilesystemStorageRepository(StorageRepository):
             content = await f.read()
 
         return content, 'application/octet-stream'
+
+
+class StorageProvider(dishka.Provider):
+    scope = dishka.Scope.REQUEST
+
+    def __init__(
+        self,
+        base_path: str,
+    ) -> None:
+        super().__init__()
+        self.base_path = base_path
+
+    @dishka.provide(provides=StorageRepository)
+    async def get_storage(self) -> FilesystemStorageRepository:
+        return FilesystemStorageRepository(self.base_path)

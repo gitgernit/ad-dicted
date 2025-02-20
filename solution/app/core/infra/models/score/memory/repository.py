@@ -1,5 +1,7 @@
 import uuid
 
+import dishka
+
 from app.core.domain.score.entities.entities import Score
 from app.core.domain.score.entities.repositories import ScoreRepository
 from app.core.infra.models.memory import MemoryStorage
@@ -42,3 +44,7 @@ class MemoryScoreRepository(ScoreRepository):
             ),
             None,
         )
+
+
+repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
+repository_provider.provide(MemoryScoreRepository)

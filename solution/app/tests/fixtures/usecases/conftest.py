@@ -16,8 +16,8 @@ from app.core.infra.models.client.memory.repository import ClientRepository
 from app.core.infra.models.impression.memory.repository import ImpressionsRepository
 from app.core.infra.models.options.memory.repository import OptionsRepository
 from app.core.infra.models.score.memory.repository import ScoreRepository
-from app.core.infra.moderation.yandexgpt import YandexGPTModerator
-from app.core.infra.text_generators.yandexgpt import YandexGPTTextGenerator
+from app.core.infra.moderation.mock import MockModerator
+from app.core.infra.text_generators.mock import MockTextGenerator
 
 # Initialize fixtures
 from app.tests.fixtures.repositories.conftest import *  # noqa
@@ -37,8 +37,8 @@ def campaign_usecase(
     campaign_repository: CampaignRepository,
     advertiser_repository: AdvertiserRepository,
     options_repository: OptionsRepository,
-    moderator: YandexGPTModerator,
-    text_generator: YandexGPTTextGenerator,
+    moderator: MockModerator,
+    text_generator: MockTextGenerator,
 ) -> CampaignUsecase:
     return CampaignUsecase(
         campaign_repository=campaign_repository,

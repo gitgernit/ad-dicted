@@ -1,5 +1,7 @@
 import uuid
 
+import dishka
+
 from app.core.domain.advertiser.entities.entities import Advertiser
 from app.core.domain.advertiser.entities.repositories import AdvertiserRepository
 from app.core.infra.models.memory import MemoryStorage
@@ -38,3 +40,7 @@ class MemoryAdvertiserRepository(AdvertiserRepository):
             (adv for adv in self._storage.advertisers if adv.id == advertiser_id),
             None,
         )
+
+
+repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
+repository_provider.provide(MemoryAdvertiserRepository)
