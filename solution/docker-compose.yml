@@ -32,7 +32,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-        restart: true
     env_file: ".env"
 #      - path: .env.template
 #        required: true
