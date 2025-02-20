@@ -33,4 +33,4 @@ class MemoryOptionsRepository(OptionsRepository):
 
 
 repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
-repository_provider.provide(MemoryOptionsRepository)
+repository_provider.provide(MemoryOptionsRepository, provides=OptionsRepository)

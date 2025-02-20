@@ -82,4 +82,4 @@ class MemoryCampaignRepository(CampaignRepository):
 
 
 repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
-repository_provider.provide(MemoryCampaignRepository)
+repository_provider.provide(MemoryCampaignRepository, provides=CampaignRepository)

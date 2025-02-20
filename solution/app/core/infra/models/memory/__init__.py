@@ -20,5 +20,9 @@ class MemoryStorage(pydantic.BaseModel):
     scores: list[Score] = pydantic.Field(default=[])
 
 
-storage_provider = dishka.Provider(scope=dishka.Scope.APP)
-storage_provider.provide(MemoryStorage)
+class StorageProvider(dishka.Provider):
+    scope = dishka.Scope.APP
+
+    @dishka.provide
+    async def get_memory_storage(self) -> MemoryStorage:
+        return MemoryStorage()

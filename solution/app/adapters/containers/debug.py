@@ -11,7 +11,7 @@ import app.core.domain.options.service.usecases
 import app.core.domain.score.service.usecases
 import app.core.domain.stats.service.usecases
 import app.core.domain.storage.service.usecases
-import app.core.infra.models.advertiser.sqlalchemy.repository as advertiser_repository
+import app.core.infra.models.advertiser.memory.repository as advertiser_repository
 import app.core.infra.models.campaign.memory.repository as campaign_repository
 import app.core.infra.models.click.memory.repository as clicks_repository
 import app.core.infra.models.client.memory.repository as client_repository
@@ -32,7 +32,7 @@ container = dishka.make_async_container(
     options_repository.repository_provider,
     impressions_repository.repository_provider,
     clicks_repository.repository_provider,
-    memory_providers.storage_provider,
+    memory_providers.StorageProvider(),
     app.core.domain.client.service.usecases.usecase_provider,
     app.core.domain.advertiser.service.usecases.usecase_provider,
     app.core.domain.score.service.usecases.usecase_provider,

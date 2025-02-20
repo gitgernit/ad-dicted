@@ -30,4 +30,4 @@ class MemoryClicksRepository(ClicksRepository):
 
 
 repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
-repository_provider.provide(MemoryClicksRepository)
+repository_provider.provide(MemoryClicksRepository, provides=ClicksRepository)

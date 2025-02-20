@@ -47,4 +47,4 @@ class MemoryScoreRepository(ScoreRepository):
 
 
 repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
-repository_provider.provide(MemoryScoreRepository)
+repository_provider.provide(MemoryScoreRepository, provides=ScoreRepository)

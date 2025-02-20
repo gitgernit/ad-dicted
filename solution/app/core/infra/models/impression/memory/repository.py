@@ -33,4 +33,4 @@ class MemoryImpressionsRepository(ImpressionsRepository):
 
 
 repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
-repository_provider.provide(MemoryImpressionsRepository)
+repository_provider.provide(MemoryImpressionsRepository, provides=ImpressionsRepository)

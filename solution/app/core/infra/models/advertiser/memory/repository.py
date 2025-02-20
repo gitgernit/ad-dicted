@@ -43,4 +43,4 @@ class MemoryAdvertiserRepository(AdvertiserRepository):
 
 
 repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
-repository_provider.provide(MemoryAdvertiserRepository)
+repository_provider.provide(MemoryAdvertiserRepository, provides=AdvertiserRepository)

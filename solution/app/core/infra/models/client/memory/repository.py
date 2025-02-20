@@ -35,4 +35,4 @@ class MemoryClientRepository(ClientRepository):
 
 
 repository_provider = dishka.Provider(scope=dishka.Scope.REQUEST)
-repository_provider.provide(MemoryClientRepository)
+repository_provider.provide(MemoryClientRepository, provides=ClientRepository)
