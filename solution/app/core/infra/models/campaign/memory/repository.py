@@ -26,7 +26,10 @@ class MemoryCampaignRepository(CampaignRepository):
             if overwrite:
                 self._storage.campaigns[existing_index] = campaign
                 return campaign
+
             return self._storage.campaigns[existing_index]
+
+        campaign.id = uuid.uuid4()
 
         self._storage.campaigns.append(campaign)
         return campaign
