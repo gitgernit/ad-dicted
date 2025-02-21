@@ -163,7 +163,8 @@ questions = [
 
 @campaigns_router.callback_query(PutCampaignCallback.filter())
 async def start_campaign_put(
-    callback: aiogram.types.CallbackQuery, state: FSMContext,
+    callback: aiogram.types.CallbackQuery,
+    state: FSMContext,
 ) -> None:
     data = PutCampaignCallback.unpack(callback.data)
 
