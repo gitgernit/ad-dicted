@@ -7,12 +7,12 @@ stages:
       method: POST
       json:
         - !include components/advertisers/advertiser1.yml
-        - !include components/advertisers/advertiser2bu.yml
+        - !include components/advertisers/advertiser3.yml
     response:
       status_code: 201
       json:
         - !include components/advertisers/advertiser1.yml
-        - !include components/advertisers/advertiser2bu.yml
+        - !include components/advertisers/advertiser3.yml
 
   - name: 'Получение рекламодателя №1'
     request:

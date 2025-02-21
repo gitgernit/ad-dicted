@@ -14,7 +14,7 @@ stages:
         - !include components/clients/client6.yml
         - !include components/clients/client7.yml
         - !include components/clients/client8.yml
-        - !include components/clients/client9bu.yml
+        - !include components/clients/client10.yml
     response:
       status_code: 201
       json:
@@ -26,7 +26,7 @@ stages:
         - !include components/clients/client6.yml
         - !include components/clients/client7.yml
         - !include components/clients/client8.yml
-        - !include components/clients/client9bu.yml
+        - !include components/clients/client10.yml
 
   - name: 'Получение клиента №2'
     request:
