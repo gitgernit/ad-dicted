@@ -23,6 +23,7 @@ from app.core.domain.feed.service.usecases import (
 from app.core.domain.feed.service.usecases import (
     FeedUsecase,
 )
+from app.core.domain.feed.service.usecases import NotAllowedError as FeedNotAllowedError
 from app.core.domain.score.service.dto import ScoreDTO
 from app.core.domain.score.service.usecases import (
     AdvertiserNotFoundError as ScoreAdvertiserNotFoundError,
@@ -149,4 +150,10 @@ async def click_campaign(
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail='Campaign is inactive (by any means).',
+            ) from error
+
+        except FeedNotAllowedError as error:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail='Click forbidden.',
             ) from error

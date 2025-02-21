@@ -31,7 +31,12 @@ class CampaignNotFoundError(Exception):
 
 class CampaignInactiveError(Exception):
     def __init__(self) -> None:
-        super().__init__(r'Given campaign is inactive (by any means).')
+        super().__init__('Given campaign is inactive (by any means).')
+
+
+class NotAllowedError(Exception):
+    def __init__(self) -> None:
+        super().__init__('Client is not allowed to do this action.')
 
 
 class FeedUsecase:
@@ -189,13 +194,21 @@ class FeedUsecase:
         if not await campaign.started(current_day) or await campaign.ended(current_day):
             raise CampaignInactiveError
 
+        impressions = await self.impressions_repository.get_campaign_impressions(
+            campaign_id,
+            current_day,
+        )
+
+        if not any(impression.client_id == client_id for impression in impressions):
+            raise CampaignInactiveError
+
         clicks = await self.clicks_repository.get_campaign_clicks(
             campaign_id,
             current_day,
         )
 
         if len(clicks) >= campaign.clicks_limit:
-            raise CampaignInactiveError
+            raise NotAllowedError
 
         if not any(click.client_id == client_id for click in clicks):
             click = CampaignClick(
