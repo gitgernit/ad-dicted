@@ -140,23 +140,22 @@ class FeedUsecase:
             campaign_score_pairs,
             key=lambda pair: (
                 pair[1],
-                # -(
-                #     (
-                #         (
-                #             (pair[0].cost_per_impression / best_impression_price)
-                #             if best_impression_price
-                #             else 0
-                #         )
-                #         + (
-                #             (pair[0].cost_per_click / best_click_price)
-                #             if best_click_price
-                #             else 0
-                #         )
-                #     )
-                #     * 2
-                #     + ((pair[2] / best_score) if best_score else 0)
-                # ),
-                pair[0].cost_per_impression + pair[0].cost_per_click,
+                -(
+                    (
+                        (
+                            (pair[0].cost_per_impression / best_impression_price)
+                            if best_impression_price
+                            else 0
+                        )
+                        + (
+                            (pair[0].cost_per_click / best_click_price)
+                            if best_click_price
+                            else 0
+                        )
+                    )
+                    * 2
+                    + ((pair[2] / best_score) if best_score else 0)
+                ),
             ),
         )
         best_campaign, viewed, best_score = best_pairs[0]
