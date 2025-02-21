@@ -37,6 +37,7 @@ class SQLAlchemyImpressionsRepository(ImpressionsRepository):
             return CampaignImpression(
                 id=new_impression.id,
                 day=new_impression.day,
+                cost=new_impression.cost,
                 client_id=new_impression.client_id,
                 campaign_id=new_impression.campaign_id,
             )
@@ -61,6 +62,7 @@ class SQLAlchemyImpressionsRepository(ImpressionsRepository):
                 CampaignImpression(
                     id=impression.id,
                     day=impression.day,
+                    cost=impression.cost,
                     client_id=impression.client_id,
                     campaign_id=impression.campaign_id,
                 )

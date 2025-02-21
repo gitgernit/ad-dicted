@@ -196,19 +196,6 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
         gender: DomainGender,
     ) -> list[DomainCampaign]:
         async with self._session_factory() as session, session.begin():
-            # stmt = sqlalchemy.select(Campaign).where(
-            #     sqlalchemy.or_(
-            #         Campaign.gender is None,
-            #         Campaign.gender == CampaignGender.ALL,
-            #         Campaign.gender == gender,
-            #     ),
-            #     sqlalchemy.or_(Campaign.age_from is None, Campaign.age_from <= age),
-            #     sqlalchemy.or_(Campaign.age_to is None, Campaign.age_to >= age),
-            #     sqlalchemy.or_(
-            #         Campaign.location is None,
-            #         Campaign.location == location,
-            #     ),
-            # )
             stmt = sqlalchemy.select(Campaign)
             result = await session.execute(stmt)
             campaigns = result.scalars().all()
@@ -218,6 +205,22 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
             output = []
 
             for campaign in campaigns:
+                if campaign.age_from is not None and age < campaign.age_from:
+                    continue
+
+                if campaign.age_to is not None and age > campaign.age_to:
+                    continue
+
+                if (
+                    campaign.gender is not None
+                    and campaign.gender != CampaignGender.ALL
+                    and campaign.gender != CampaignGender(gender)
+                ):
+                    continue
+
+                if campaign.location is not None and campaign.location != location:
+                    continue
+
                 targeting_options = {
                     'gender': campaign.gender,
                     'age_from': campaign.age_from,
