@@ -67,8 +67,10 @@ class Campaign(Base):
     impressions: Mapped[list['Impression']] = relationship(
         'Impression',
         back_populates='campaign',
+        cascade='all, delete-orphan',
     )
     clicks: Mapped[list['Click']] = relationship(
         'Click',
         back_populates='campaign',
+        cascade='all, delete-orphan',
     )

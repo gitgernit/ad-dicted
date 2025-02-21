@@ -25,15 +25,6 @@ class SQLAlchemyClientRepository(ClientRepository):
         overwrite: bool = False,
     ) -> DomainClient:
         async with self._session_factory() as session, session.begin():
-            stmt = sqlalchemy.select(Client).where(Client.login == client.login)
-
-            existing_client = await session.execute(stmt)
-            existing_client = existing_client.scalar_one_or_none()
-
-            if existing_client:
-                await session.delete(existing_client)
-                await session.flush()
-
             new_client = Client(
                 id=client.id,
                 login=client.login,

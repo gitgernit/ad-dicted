@@ -21,7 +21,7 @@ class Client(Base):
         primary_key=True,
         unique=True,
     )
-    login: Mapped[str] = mapped_column(sa.String, nullable=False, unique=True)
+    login: Mapped[str] = mapped_column(sa.String, nullable=False)
     age: Mapped[int] = mapped_column(sa.Integer, nullable=False)
     location: Mapped[str] = mapped_column(sa.String, nullable=False)
     gender: Mapped[ClientGender] = mapped_column(sa.Enum(ClientGender), nullable=False)
