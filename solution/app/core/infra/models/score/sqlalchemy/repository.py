@@ -64,7 +64,7 @@ class SQLAlchemyScoreRepository(ScoreRepository):
                 return None
 
             return DomainScore(
-                client_id=score.user_id,
+                client_id=score.client_id,
                 advertiser_id=score.advertiser_id,
                 score=score.score,
             )
