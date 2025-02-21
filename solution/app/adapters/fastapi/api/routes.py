@@ -105,13 +105,13 @@ async def get_campaign(
 
         except FeedClientNotFoundError as error:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail='Client not found.',
             ) from error
 
         except FeedCampaignNotFoundError as error:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_406_NOT_ACCEPTABLE,
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail='No campaign found.',
             ) from error
 
