@@ -127,17 +127,33 @@ class FeedUsecase:
             )
 
         best_score = max(campaign_score_pairs, key=lambda pair: pair[2])[2]
-        best_price = max(
+        best_impression_price = max(
             campaign_score_pairs,
             key=lambda pair: pair[0].cost_per_impression,
         )[0].cost_per_impression
+        best_click_price = max(
+            campaign_score_pairs,
+            key=lambda pair: pair[0].cost_per_click,
+        )[0].cost_per_click
 
         best_pairs = sorted(
             campaign_score_pairs,
             key=lambda pair: (
                 pair[1],
                 -(
-                    pair[0].cost_per_impression / best_price * 10
+                    (
+                        (
+                            (pair[0].cost_per_impression / best_impression_price)
+                            if best_impression_price
+                            else 0
+                        )
+                        + (
+                            (pair[0].cost_per_click / best_click_price)
+                            if best_click_price
+                            else 0
+                        )
+                    )
+                    * 2
                     + ((pair[2] / best_score) if best_score else 0)
                 ),
             ),
