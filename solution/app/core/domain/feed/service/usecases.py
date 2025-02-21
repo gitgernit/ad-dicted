@@ -138,7 +138,7 @@ class FeedUsecase:
                 pair[1],
                 -(
                     pair[0].cost_per_impression / best_price * 2
-                    + ((pair[1] / best_score) if best_score else 0)
+                    + ((pair[2] / best_score) if best_score else 0)
                 ),
             ),
         )
@@ -200,15 +200,15 @@ class FeedUsecase:
         )
 
         if not any(impression.client_id == client_id for impression in impressions):
-            raise CampaignInactiveError
-
-        clicks = await self.clicks_repository.get_campaign_clicks(
-            campaign_id,
-            current_day,
-        )
-
-        if len(clicks) >= campaign.clicks_limit:
             raise NotAllowedError
+
+        # clicks = await self.clicks_repository.get_campaign_clicks(
+        #     campaign_id,
+        #     current_day,
+        # )
+        #
+        # if len(clicks) >= campaign.clicks_limit:
+        #     raise NotAllowedError
 
         if not any(click.client_id == client_id for click in clicks):
             click = CampaignClick(
