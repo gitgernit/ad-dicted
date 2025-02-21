@@ -57,6 +57,7 @@ class SQLAlchemyClicksRepository(ClicksRepository):
                 DomainClick(
                     id=click.id,
                     day=click.day,
+                    cost=click.cost,
                     client_id=click.client_id,
                     campaign_id=click.campaign_id,
                 )
