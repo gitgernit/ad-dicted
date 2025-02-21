@@ -196,19 +196,20 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
         gender: DomainGender,
     ) -> list[DomainCampaign]:
         async with self._session_factory() as session, session.begin():
-            stmt = sqlalchemy.select(Campaign).where(
-                # sqlalchemy.or_(
-                #     Campaign.gender is None,
-                #     Campaign.gender == CampaignGender.ALL,
-                #     Campaign.gender == gender,
-                # ),
-                # sqlalchemy.or_(Campaign.age_from is None, Campaign.age_from <= age),
-                # sqlalchemy.or_(Campaign.age_to is None, Campaign.age_to >= age),
-                # sqlalchemy.or_(
-                #     Campaign.location is None,
-                #     Campaign.location == location,
-                # ),
-            )
+            # stmt = sqlalchemy.select(Campaign).where(
+            #     sqlalchemy.or_(
+            #         Campaign.gender is None,
+            #         Campaign.gender == CampaignGender.ALL,
+            #         Campaign.gender == gender,
+            #     ),
+            #     sqlalchemy.or_(Campaign.age_from is None, Campaign.age_from <= age),
+            #     sqlalchemy.or_(Campaign.age_to is None, Campaign.age_to >= age),
+            #     sqlalchemy.or_(
+            #         Campaign.location is None,
+            #         Campaign.location == location,
+            #     ),
+            # )
+            stmt = sqlalchemy.select(Campaign)
             result = await session.execute(stmt)
             campaigns = result.scalars().all()
 
