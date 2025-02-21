@@ -100,28 +100,27 @@ async def get_campaign(
     usecase: FromDishka[FeedUsecase],
     client_id: uuid.UUID,
 ) -> CampaignOutputSchema:
-    async with lock:
-        try:
-            best_campaign_dto = await usecase.get_best_campaign(client_id)
+    try:
+        best_campaign_dto = await usecase.get_best_campaign(client_id)
 
-        except FeedClientNotFoundError as error:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail='Client not found.',
-            ) from error
+    except FeedClientNotFoundError as error:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail='Client not found.',
+        ) from error
 
-        except FeedCampaignNotFoundError as error:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail='No campaign found.',
-            ) from error
+    except FeedCampaignNotFoundError as error:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='No campaign found.',
+        ) from error
 
-        return CampaignOutputSchema(
-            ad_id=best_campaign_dto.id,
-            advertiser_id=best_campaign_dto.advertiser_id,
-            ad_title=best_campaign_dto.ad_title,
-            ad_text=best_campaign_dto.ad_text,
-        )
+    return CampaignOutputSchema(
+        ad_id=best_campaign_dto.id,
+        advertiser_id=best_campaign_dto.advertiser_id,
+        ad_title=best_campaign_dto.ad_title,
+        ad_text=best_campaign_dto.ad_text,
+    )
 
 
 @api_router.post('/ads/{adId}/click', status_code=fastapi.status.HTTP_204_NO_CONTENT)
@@ -130,30 +129,29 @@ async def click_campaign(
     campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='adId')],
     client_id: typing.Annotated[uuid.UUID, fastapi.Body()],
 ) -> None:
-    async with lock:
-        try:
-            await usecase.click_campaign(client_id, campaign_id)
+    try:
+        await usecase.click_campaign(client_id, campaign_id)
 
-        except FeedClientNotFoundError as error:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail='Client not found.',
-            ) from error
+    except FeedClientNotFoundError as error:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='Client not found.',
+        ) from error
 
-        except FeedCampaignNotFoundError as error:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_404_NOT_FOUND,
-                detail='No campaign found.',
-            ) from error
+    except FeedCampaignNotFoundError as error:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='No campaign found.',
+        ) from error
 
-        except FeedCampaignInactiveError as error:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail='Campaign is inactive (by any means).',
-            ) from error
+    except FeedCampaignInactiveError as error:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail='Campaign is inactive (by any means).',
+        ) from error
 
-        except FeedNotAllowedError as error:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail='Click forbidden.',
-            ) from error
+    except FeedNotAllowedError as error:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail='Click forbidden.',
+        ) from error
