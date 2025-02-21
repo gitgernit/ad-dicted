@@ -152,9 +152,8 @@ async def click_campaign(
                 detail='Campaign is inactive (by any means).',
             ) from error
 
-        except FeedNotAllowedError:
-            # raise fastapi.HTTPException(
-            #     status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-            #     detail='Click forbidden.',
-            # ) from error
-            pass
+        except FeedNotAllowedError as error:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail='Click forbidden.',
+            ) from error
