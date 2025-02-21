@@ -132,7 +132,7 @@ class FeedUsecase:
             key=lambda pair: (
                 pair[1],
                 -(
-                    pair[0].cost_per_impression / best_price * 2
+                    pair[0].cost_per_impression / best_price * 4
                     + ((pair[1] / best_score) if best_score else 0)
                 ),
             ),
