@@ -32,3 +32,8 @@ class Advertiser(Base):
         back_populates='advertiser',
         cascade='all, delete-orphan',
     )
+    telegram_advertiser: Mapped[list['TelegramAdvertiser']] = relationship(
+        'TelegramAdvertiser',
+        back_populates='advertiser',
+        cascade='all, delete-orphan',
+    )

@@ -15,3 +15,4 @@ def load_models() -> None:
     import app.core.infra.models.impression.sqlalchemy.impression
     import app.core.infra.models.options.sqlalchemy.options
     import app.core.infra.models.score.sqlalchemy.score
+    import app.core.infra.models.telegram_advertisers.sqlalchemy.telegram_advertiser

@@ -11,6 +11,8 @@ class Config(pydantic_settings.BaseSettings):
 
     MODERATE_TEXTS: bool = pydantic.Field(default=False)
 
+    TOKEN_TELEGRAM_API: str = pydantic.Field(default='')
+
     POSTGRES_USERNAME: str = pydantic.Field(default='postgres')
     POSTGRES_PASSWORD: str = pydantic.Field(default='postgres')
     POSTGRES_HOST: str = pydantic.Field(default='localhost')

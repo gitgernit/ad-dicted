@@ -1,3 +1,4 @@
+import dishka.integrations.aiogram
 import dishka.integrations.fastapi
 
 import app.core.config
@@ -18,6 +19,7 @@ import app.core.infra.models.impression.sqlalchemy.repository as impressions_rep
 import app.core.infra.models.options.sqlalchemy.repository as options_repository
 import app.core.infra.models.score.sqlalchemy.repository as score_repository
 import app.core.infra.models.sqlalchemy.providers as sqlalchemy_providers
+import app.core.infra.models.telegram_advertisers.sqlalchemy.repository as telegram_advertisers_repository
 import app.core.infra.storage.s3.repository as storage_providers
 import app.core.infra.text_generators.yandexgpt as generator_providers
 import app.core.infra.yandexgpt.interactors as yandexgpt_providers
@@ -30,6 +32,7 @@ else:
 
 container = dishka.make_async_container(
     dishka.integrations.fastapi.FastapiProvider(),
+    dishka.integrations.aiogram.AiogramProvider(),
     client_repository.repository_provider,
     advertiser_repository.repository_provider,
     score_repository.repository_provider,
@@ -37,6 +40,7 @@ container = dishka.make_async_container(
     options_repository.repository_provider,
     impressions_repository.repository_provider,
     clicks_repository.repository_provider,
+    telegram_advertisers_repository.repository_provider,
     app.core.domain.client.service.usecases.usecase_provider,
     app.core.domain.advertiser.service.usecases.usecase_provider,
     app.core.domain.score.service.usecases.usecase_provider,
