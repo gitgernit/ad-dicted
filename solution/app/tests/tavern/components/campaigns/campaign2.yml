@@ -1,10 +1,11 @@
-cost_per_impression: 23.4
-cost_per_click: 15.2
-ad_title: Пора в отпуск! Найди билет за копейки
-ad_text: Зачем переплачивать за перелёты? Скачивай Aviasales и находи самые выгодные цены в один клик.
+cost_per_impression: 2.25
+cost_per_click: 1
+ad_title: растпобеда
+ad_text: говорит за себя
 targeting:
-  age_from: 18
-impressions_limit: 10
-clicks_limit: 8
-start_date: 1
-end_date: 5
+  age_from: 10
+  age_to: 20
+impressions_limit: 100
+clicks_limit: 1
+start_date: 0
+end_date: 0
