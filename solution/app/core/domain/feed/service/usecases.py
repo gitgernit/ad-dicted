@@ -88,16 +88,16 @@ class FeedUsecase:
             )
             clicks = await self.clicks_repository.get_campaign_clicks(campaign.id)
 
-            if len(impressions) >= campaign.impressions_limit:
-                continue
-
-            if len(clicks) >= campaign.clicks_limit:
-                continue
-
             viewed = False
 
             if any(impression.client_id == client_id for impression in impressions):
                 viewed = True
+
+            if not viewed and len(impressions) >= campaign.impressions_limit:
+                continue
+
+            if not viewed and len(clicks) >= campaign.clicks_limit:
+                continue
 
             active_campaigns.append((campaign, viewed))
 
