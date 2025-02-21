@@ -161,7 +161,7 @@ class CampaignUsecase:
         existing_campaign = await self.campaign_repository.get_campaign(
             campaign_id,
         )
-        started = await campaign.started(
+        started = await existing_campaign.started(
             int((await self.options_repository.get_option(AvailableOptions.DAY)).value),
         )
 

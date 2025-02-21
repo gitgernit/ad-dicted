@@ -6,6 +6,7 @@ import aiogram.dispatcher.dispatcher
 import dishka.integrations.aiogram
 
 import app.core.config
+from app.adapters.aiogram.campaigns.handlers import campaigns_router
 from app.adapters.aiogram.handlers import main_router
 from app.adapters.aiogram.menu.handlers import menu_router
 
@@ -24,6 +25,7 @@ dp = aiogram.dispatcher.dispatcher.Dispatcher()
 dp.include_routers(
     main_router,
     menu_router,
+    campaigns_router,
 )
 
 

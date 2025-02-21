@@ -4,7 +4,6 @@ import uuid
 
 import aiogram
 import aiogram.filters
-import dishka
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.scene import Scene, SceneRegistry, on
 from dishka.integrations.aiogram import FromDishka, inject
@@ -14,6 +13,9 @@ from app.core.domain.advertiser.service.usecases import AdvertiserUsecase
 from app.core.infra.models.telegram_advertisers.interface import (
     TelegramAdvertisersRepository,
 )
+
+if typing.TYPE_CHECKING:
+    import dishka
 
 main_router = aiogram.Router()
 registry = SceneRegistry(main_router)
@@ -67,15 +69,16 @@ class RegistrationScene(Scene, state='registration'):
         message: aiogram.types.Message,
         state: FSMContext,
         repository: FromDishka[TelegramAdvertisersRepository],
-    ) -> typing.Any:
+    ) -> None:
         if (
             await repository.get_advertiser(telegram_id=str(message.from_user.id))
             is not None
         ):
             await self.wizard.exit(success=False)
-            return await message.answer(
-                'Вы уже зарегистрированы. Используйте /menu для получения меню команд.'
+            await message.answer(
+                'Вы уже зарегистрированы. Используйте /menu для получения меню команд.',
             )
+            return
 
         data = await state.get_data()
         data['step'] = 0
@@ -88,14 +91,14 @@ class RegistrationScene(Scene, state='registration'):
             'Добро пожаловать в ad-dicted! '
             'Пожалуйста, зарегистрируйтесь как рекламодатель:',
         )
-        return await message.answer(question.text)
+        await message.answer(question.text)
 
     @on.message(aiogram.F.text)
     async def on_answer(
         self,
         message: aiogram.types.Message,
         state: FSMContext,
-    ) -> typing.Any:
+    ) -> None:
         data = await state.get_data()
         step = data['step']
 
@@ -107,9 +110,11 @@ class RegistrationScene(Scene, state='registration'):
 
         if data[step] is not None:
             new_question = questions[data[step]]
-            return await message.answer(new_question.text)
+            await message.answer(new_question.text)
+            return
 
         await self.wizard.exit(success=True)
+        return
 
     @on.message.exit()
     @inject
@@ -119,10 +124,11 @@ class RegistrationScene(Scene, state='registration'):
         state: FSMContext,
         repository: FromDishka[TelegramAdvertisersRepository],
         usecase: FromDishka[AdvertiserUsecase],
-        success: bool,
-    ) -> typing.Any:
+        *,
+        success: bool = False,
+    ) -> None:
         if not success:
-            return None
+            return
 
         data = await state.get_data()
         answers = data['answers']
@@ -138,8 +144,8 @@ class RegistrationScene(Scene, state='registration'):
             advertiser_id=dto.id,
         )
 
-        return await message.answer(
-            f'Вы успешно зарегистрировали рекламодателя "{dto.name}". ID: {dto.id}'
+        await message.answer(
+            f'Вы успешно зарегистрировали рекламодателя "{dto.name}". ID: {dto.id}',
         )
 
 

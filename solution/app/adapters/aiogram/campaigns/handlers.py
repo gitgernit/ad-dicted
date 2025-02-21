@@ -1,53 +1,105 @@
 import dataclasses
+import uuid
 
 import aiogram
-import aiogram.filters
+import aiogram.filters.callback_data
 import aiogram.fsm.state
-import aiogram.types
 import pydantic
 from aiogram.fsm.context import FSMContext
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dishka.integrations.aiogram import FromDishka, inject
 
 from app.core.domain.campaign.service.dto import CampaignDTO, Gender, TargetingDTO
-from app.core.domain.campaign.service.usecases import CampaignUsecase
+from app.core.domain.campaign.service.usecases import (
+    CampaignUsecase,
+    InvalidCampaignError,
+)
+from app.core.domain.stats.service.usecases import StatsUsecase
 from app.core.infra.models.telegram_advertisers.interface import (
     TelegramAdvertisersRepository,
 )
 
-menu_router = aiogram.Router()
+campaigns_router = aiogram.Router()
 
 
-@menu_router.message(aiogram.filters.Command('menu'))
+class CampaignCallback(aiogram.filters.callback_data.CallbackData, prefix='campaign'):
+    campaign_id: str
+
+
+class DeleteCampaignCallback(aiogram.filters.callback_data.CallbackData, prefix='dc'):
+    campaign_id: str
+
+
+class PutCampaignCallback(aiogram.filters.callback_data.CallbackData, prefix='pc'):
+    campaign_id: str
+
+
+@campaigns_router.callback_query(CampaignCallback.filter())
 @inject
-async def menu(
-    message: aiogram.types.Message,
-    state: FSMContext,
+async def show_campaign(
+    query: aiogram.types.CallbackQuery,
     repository: FromDishka[TelegramAdvertisersRepository],
-    usecase: FromDishka[CampaignUsecase],
+    campaign_usecase: FromDishka[CampaignUsecase],
+    stats_usecase: FromDishka[StatsUsecase],
 ) -> None:
-    advertiser_id = await repository.get_advertiser(str(message.from_user.id))
-    campaigns = await usecase.get_advertiser_campaigns(advertiser_id)
+    data = CampaignCallback.unpack(query.data)
 
-    keyboard = InlineKeyboardBuilder()
+    await repository.get_advertiser(str(query.from_user.id))
+    campaign_id = uuid.UUID(data.campaign_id)
 
-    for campaign in campaigns:
-        keyboard.button(
-            text=campaign.ad_title,
-            callback_data=f'campaign:{campaign.id}',
-        )
+    campaign = await campaign_usecase.get_campaign(campaign_id)
+    stats = await stats_usecase.get_total_campaign_stats(campaign.id)
 
-    keyboard.button(
-        text='Создать кампанию',
-        callback_data='create_campaign',
+    stats_message = (
+        f'Показы: {stats.impressions_count}\n'
+        f'Потрачено на показы: {stats.spent_impressions}\n'
+        f'Клики: {stats.clicks_count}\n'
+        f'Потрачено на клики: {stats.spent_clicks}\n'
+        f'Конверсия: {stats.conversion}%\n'
+        f'Общие затраты: {stats.spent_total}'
     )
 
-    keyboard.adjust(1)
+    keyboard = aiogram.types.InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                aiogram.types.InlineKeyboardButton(
+                    text='Удалить кампанию',
+                    callback_data=f'dc:{campaign.id}',
+                ),
+                aiogram.types.InlineKeyboardButton(
+                    text='Изменить кампанию',
+                    callback_data=f'pc:{campaign.id}',
+                ),
+            ],
+        ],
+    )
 
-    await message.answer('Ваши кампании:', reply_markup=keyboard.as_markup())
+    await query.message.delete()
+    await query.message.answer(
+        f'{campaign.ad_title}\n{campaign.ad_text}\n\n{stats_message}',
+        reply_markup=keyboard,
+    )
+    await query.answer()
 
 
-class CampaignCreationState(aiogram.fsm.state.StatesGroup):
+@campaigns_router.callback_query(DeleteCampaignCallback.filter())
+@inject
+async def delete_campaign(
+    query: aiogram.types.CallbackQuery,
+    repository: FromDishka[TelegramAdvertisersRepository],
+    campaign_usecase: FromDishka[CampaignUsecase],
+) -> None:
+    data = DeleteCampaignCallback.unpack(query.data)
+
+    advertiser_id = await repository.get_advertiser(str(query.from_user.id))
+    campaign_id = uuid.UUID(data.campaign_id)
+
+    await campaign_usecase.delete_campaign(campaign_id, advertiser_id)
+
+    await query.answer('Кампания успешно удалена!')
+    await query.message.delete()
+
+
+class CampaignPutState(aiogram.fsm.state.StatesGroup):
     active = aiogram.fsm.state.State()
 
 
@@ -109,13 +161,14 @@ questions = [
 ]
 
 
-@menu_router.callback_query(aiogram.F.data == 'create_campaign')
-async def start_campaign_creation(
-    callback: aiogram.types.CallbackQuery,
-    state: FSMContext,
+@campaigns_router.callback_query(PutCampaignCallback.filter())
+async def start_campaign_put(
+    callback: aiogram.types.CallbackQuery, state: FSMContext,
 ) -> None:
-    await state.set_state(CampaignCreationState.active)
-    await state.update_data(step=0, answers={})
+    data = PutCampaignCallback.unpack(callback.data)
+
+    await state.set_state(CampaignPutState.active)
+    await state.update_data(step=0, answers={}, campaign_id=data.campaign_id)
 
     question = questions[0]
     await callback.message.answer(
@@ -125,7 +178,7 @@ async def start_campaign_creation(
     await callback.answer()
 
 
-@menu_router.message(aiogram.filters.StateFilter(CampaignCreationState.active))
+@campaigns_router.message(aiogram.filters.StateFilter(CampaignPutState.active))
 @inject
 async def process_campaign_answer(
     message: aiogram.types.Message,
@@ -144,10 +197,11 @@ async def process_campaign_answer(
         data['step'] = step
         await state.update_data(data)
         new_question = questions[step]
-        return await message.answer(new_question.text)
+        await message.answer(new_question.text)
+        return
 
     await finalize_campaign(message, state, repository, usecase)
-    return None
+    return
 
 
 async def finalize_campaign(
@@ -158,6 +212,7 @@ async def finalize_campaign(
 ) -> None:
     data = await state.get_data()
     answers = data['answers']
+    campaign_id = uuid.UUID(data['campaign_id'])
 
     advertiser_id = await repository.get_advertiser(str(message.from_user.id))
     if advertiser_id is None:
@@ -202,14 +257,12 @@ async def finalize_campaign(
             end_date=int(answers.get('end_date')) if answers.get('end_date') else None,
             targeting=targeting_dto,
         )
+        dto = await usecase.patch_campaign(campaign_id, campaign_dto)
 
-    except (pydantic.ValidationError, ValueError, TypeError):
+    except (InvalidCampaignError, pydantic.ValidationError, ValueError, TypeError):
         await message.answer('Произошли ошибки валидации, перепроверьте поля :(')
         await state.clear()
         return
 
-    dto = await usecase.create_campaign(campaign_dto)
-    await message.answer(
-        f'Вы успешно зарегистрировали кампанию "{dto.ad_title}". ID: {dto.id}',
-    )
+    await message.answer(f'Вы успешно изменили кампанию "{dto.ad_title}". ID: {dto.id}')
     await state.clear()

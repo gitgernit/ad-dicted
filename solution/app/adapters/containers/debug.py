@@ -20,7 +20,7 @@ import app.core.infra.models.impression.memory.repository as impressions_reposit
 import app.core.infra.models.memory as memory_providers
 import app.core.infra.models.options.memory.repository as options_repository
 import app.core.infra.models.score.memory.repository as score_repository
-import app.core.infra.models.telegram_advertisers.memory.repository as telegram_advertisers_repository
+import app.core.infra.models.telegram_advertisers.memory.repository as telegram_advertisers_repository  # noqa
 import app.core.infra.moderation.mock as moderator_providers
 import app.core.infra.storage.filesystem.repository as storage_providers
 import app.core.infra.text_generators.mock as generator_providers
