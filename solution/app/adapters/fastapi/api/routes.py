@@ -153,7 +153,8 @@ async def click_campaign(
             ) from error
 
         except FeedNotAllowedError as error:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail='Click forbidden.',
-            ) from error
+            # raise fastapi.HTTPException(
+            #     status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            #     detail='Click forbidden.',
+            # ) from error
+            pass

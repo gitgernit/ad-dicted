@@ -91,8 +91,8 @@ class FeedUsecase:
             if len(impressions) >= campaign.impressions_limit:
                 continue
 
-            if len(clicks) >= campaign.clicks_limit:
-                continue
+            # if len(clicks) >= campaign.clicks_limit:
+            #     continue
 
             viewed = False
 
