@@ -210,13 +210,13 @@ class FeedUsecase:
         if not await campaign.started(current_day) or await campaign.ended(current_day):
             raise CampaignInactiveError
 
-        # impressions = await self.impressions_repository.get_campaign_impressions(
-        #     campaign_id,
-        #     current_day,
-        # )
-        #
-        # if not any(impression.client_id == client_id for impression in impressions):
-        #     raise NotAllowedError
+        impressions = await self.impressions_repository.get_campaign_impressions(
+            campaign_id,
+            current_day,
+        )
+
+        if not any(impression.client_id == client_id for impression in impressions):
+            raise NotAllowedError
 
         clicks = await self.clicks_repository.get_campaign_clicks(
             campaign_id,
