@@ -128,7 +128,7 @@ async def get_campaign(
 async def click_campaign(
     usecase: FromDishka[FeedUsecase],
     campaign_id: typing.Annotated[uuid.UUID, fastapi.Path(alias='adId')],
-    client_id: typing.Annotated[uuid.UUID, fastapi.Body()],
+    client_id: typing.Annotated[uuid.UUID, fastapi.Body(embed=True)],
 ) -> None:
     async with lock:
         try:

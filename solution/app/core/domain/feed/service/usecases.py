@@ -218,10 +218,10 @@ class FeedUsecase:
         if not any(impression.client_id == client_id for impression in impressions):
             raise NotAllowedError
 
-        # clicks = await self.clicks_repository.get_campaign_clicks(
-        #     campaign_id,
-        #     current_day,
-        # )
+        clicks = await self.clicks_repository.get_campaign_clicks(
+            campaign_id,
+            current_day,
+        )
         #
         # if len(clicks) >= campaign.clicks_limit:
         #     raise NotAllowedError

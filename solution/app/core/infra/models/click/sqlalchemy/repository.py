@@ -19,7 +19,7 @@ class SQLAlchemyClicksRepository(ClicksRepository):
 
     async def create_click(self, click: DomainClick) -> DomainClick:
         async with self._session_factory() as session, session.begin():
-            new_click = DomainClick(
+            new_click = Click(
                 day=click.day,
                 cost=click.cost,
                 client_id=click.client_id,
@@ -34,6 +34,7 @@ class SQLAlchemyClicksRepository(ClicksRepository):
             return DomainClick(
                 id=new_click.id,
                 day=new_click.day,
+                cost=new_click.cost,
                 client_id=new_click.client_id,
                 campaign_id=new_click.campaign_id,
             )
