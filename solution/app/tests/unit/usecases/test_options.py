@@ -1,8 +1,6 @@
-import uuid
-
 import pytest
 
-from app.core.domain.options.service.dto import OptionDTO, AvailableOptionsDTO
+from app.core.domain.options.service.dto import AvailableOptionsDTO, OptionDTO
 from app.core.domain.options.service.usecases import OptionsUsecase
 
 
