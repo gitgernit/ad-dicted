@@ -51,8 +51,6 @@ services:
     restart: always
     networks:
       - default
-    ports:
-      - "$SERVER_PORT:$SERVER_PORT"
     depends_on:
       postgres:
         condition: service_healthy
