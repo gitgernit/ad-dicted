@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 import sqlalchemy as sa
@@ -26,6 +27,10 @@ class Click(Base):
     campaign_id: Mapped[uuid.UUID] = mapped_column(
         sa.ForeignKey('campaigns.id'),
         nullable=False,
+    )
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        sa.DateTime(timezone=True),
+        server_default=sa.sql.func.now(),
     )
 
     client = relationship('Client', back_populates='clicks')
