@@ -160,6 +160,10 @@ class FeedUsecase:
         )
         best_campaign, viewed, best_score = best_pairs[0]
 
+        if viewed:
+            best_pairs = sorted(best_pairs, key=lambda pair: pair[2])
+            best_campaign, viewed, best_score = best_pairs[0]
+
         if not viewed:
             new_impression = CampaignImpression(
                 day=current_day,
