@@ -31,9 +31,9 @@
     * [Testing](#testing)
     * [VCS](#vcs)
   * [Schemas](#schemas)
-  * [Usage Demonstration](#usage-demonstration)
-    * [API](#api)
-    * [Bot](#bot)
+* [Usage Demonstration](#usage-demonstration)
+  * [API](#api)
+  * [Bot](#bot)
 
 ## Description
 ad-dicted is an advertisement engine which utilizes a special algorithm to
@@ -210,13 +210,13 @@ Example given:
 ad-dicted utilizes the following relational SQL schema:
 ![db-schema](assets/db-schema.png)
 
-### Usage demonstration
-#### API
+## Usage demonstration
+### API
 You can test the api using e2e tests, or manually. For example,
 by using postman:
 ![api-usage-postman](assets/api-usage-postman.png)
 
-#### Bot
+### Bot
 The bot is designed to be a barebones implementation of end user interaction.
 Though the bot lacks many features, you can still trace a few use cases through it:
 ![addicted-bot-demo](assets/addicted-bot-demo.gif)
