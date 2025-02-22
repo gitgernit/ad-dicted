@@ -24,7 +24,7 @@
     * [Layers](#layers)
     * [Service Dependencies](#service-dependencies)
     * [Data Storages](#data-storages)
-    * [Moderation And Text Generation](#moderation-and-text-generation)
+  * [Moderation And Text Generation](#moderation-and-text-generation)
   * [Development](#development)
     * [Project Management](#project-management)
     * [Linting](#linting)
@@ -170,7 +170,7 @@ So, a simple scenario to upload \ fetch an image to a campaign would require the
 then, the frontend client would send a request to upload that image to the server. In latter campaign fetching,
 the frontend client would send a request to download the image and output it to the client.
 
-#### Moderation And Text Generation
+### Moderation And Text Generation
 ad-dicted uses YandexGPT in order to moderate and generate texts. A basic flow for creating a campaign 
 & moderating its text would be:
 1. (optional) Call description generation endpoint to generate a campaign description
@@ -198,6 +198,18 @@ all PostgreSQL calls are replaced with in-memory calls, all S3 calls are replace
 in a temporary directory, all YandexGPT calls are mocked. This was implemented specifically for the sole
 purpose of making unit tests as independent as they get. You can also turn this behaviour manually, 
 by using the `DEBUG` [environment variable](#configuration).
+
+To run the tests, use the `pytest [dir]` command. You will need to have all the dependencies installed
+in order for tests to work correctly. Example:
+```shell
+cd solution
+pip install uv
+uv sync
+. .venv/bin/activate
+pytest app/tests/unit
+```
+
+Also note that end-to-end tests expect a server instance running on localhost:8080.
 
 #### VCS
 ad-dicted enforces the standard commit convention:  
