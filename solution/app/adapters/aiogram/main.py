@@ -6,6 +6,8 @@ import aiogram.dispatcher.dispatcher
 import dishka.integrations.aiogram
 
 import app.core.config
+import app.core.domain.options.service.dto
+import app.core.domain.options.service.usecases
 from app.adapters.aiogram.campaigns.handlers import campaigns_router
 from app.adapters.aiogram.handlers import main_router
 from app.adapters.aiogram.menu.handlers import menu_router
@@ -31,6 +33,23 @@ dp.include_routers(
 
 async def main() -> None:
     dishka.integrations.aiogram.setup_dishka(container, dp)
+
+    async with container() as request_container:
+        options_usecase = await request_container.get(
+            app.core.domain.options.service.usecases.OptionsUsecase,
+        )
+        day = await options_usecase.get_option(
+            app.core.domain.options.service.dto.AvailableOptionsDTO.DAY,
+        )
+
+        if day is None:
+            await options_usecase.set_option(
+                app.core.domain.options.service.dto.OptionDTO(
+                    option=app.core.domain.options.service.dto.AvailableOptionsDTO.DAY,
+                    value=str(0),
+                ),
+            )
+
     await dp.start_polling(bot)
 
 
